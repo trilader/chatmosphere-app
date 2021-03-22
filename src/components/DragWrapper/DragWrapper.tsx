@@ -40,9 +40,9 @@ const DragWrapper = ({initPos={x:0,y:0}, children, callback=(pos)=>null, current
         );
         callback({ x: xPos, y: yPos });
     }
-};
+  };
 
-const onDragTouch = (e) => {
+  const onDragTouch = (e) => {
     e.preventDefault();
     e.stopPropagation();
     if (element.current !== undefined) {
@@ -57,26 +57,28 @@ const onDragTouch = (e) => {
             'style',
             `transform:translate(${xPos}px, ${yPos}px);`
         );
+        console.log({ x: xPos, y: yPos });
         callback({ x: xPos, y: yPos });
     }
-};
+  };
 
-const onUp = (e) => {
+  const onUp = (e) => {
     console.log(e);
     e.preventDefault();
     document.removeEventListener('mouseup', onUp);
     document.removeEventListener('mousemove', onDrag);
-};
+  };
 
-const onUpTouch = (e) => {
+  const onUpTouch = (e) => {
     console.log(e);
     e.preventDefault();
     document.removeEventListener('touchstop', onUpTouch);
-    document.removeEventListener('ontouchmove', onDragTouch);
-};
+    document.removeEventListener('touchmove', onDragTouch);
+  };
 
-const onDownTouch = (e) => {
+  const onDownTouch = (e) => {
     e.preventDefault();
+    e.stopPropagation();
     console.log(e);
     const boundingRect = e.currentTarget.getBoundingClientRect();
     clickDelta.current = {
@@ -88,10 +90,10 @@ const onDownTouch = (e) => {
         ),
     };
     document.addEventListener('touchstop', onUpTouch);
-    document.addEventListener('ontouchmove', onDragTouch);
-};
+    document.addEventListener('touchmove', onDragTouch);
+  };
 
-const onDown = (e) => {
+  const onDown = (e) => {
     e.preventDefault();
     const boundingRect = e.currentTarget.getBoundingClientRect();
     clickDelta.current = {
@@ -104,7 +106,7 @@ const onDown = (e) => {
     };
     document.addEventListener('mouseup', onUp);
     document.addEventListener('mousemove', onDrag);
-};
+  };
 
   useEffect(() => {
     // element?.current?.setAttribute('style', `left:${initPos.x}px; top:${initPos.y}px`)
