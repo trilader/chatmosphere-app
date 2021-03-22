@@ -6,6 +6,8 @@ import { getVolumeByDistance } from '../utils/VectorHelpers';
 import { useConnectionStore } from './ConnectionStore';
 import { useLocalStore } from './LocalStore';
 
+import { panOptions } from '../components/PanWrapper/panOptions';
+
 // # TS DEFINITIONS *******************************************
 
 declare global {
@@ -87,7 +89,7 @@ export const useConferenceStore = create<ConferenceStore>((set,get) => {
 
   // Private Helper Functions *******************************************
   const _addUser = (id:ID, user?:any) :void => produceAndSet (newState => {
-    newState.users[id] = {id:id, user:user, mute:false, volume:1, pos:{x:0, y:0}}
+    newState.users[id] = {id:id, user:user, mute:false, volume:1, pos: panOptions.user.initialPosition }
   })
   const _removeUser = (id:ID) :void => produceAndSet (newState => {
     delete newState.users[id]
