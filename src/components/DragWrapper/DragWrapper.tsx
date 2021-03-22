@@ -114,7 +114,7 @@ const onDown = (e) => {
   },[])
 
   return (
-    <DragElement ref={element} onMouseDown={onDown} id="DragElement">
+    <DragElement ref={element} onMouseDown={onDown} onTouchStart={onDownTouch} id="DragElement">
       {children}
     </DragElement>
   )
