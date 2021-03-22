@@ -11,6 +11,7 @@ import { UserDragContainer } from '../../components/Localuser/LocalUserContainer
 import { PanWrapper } from '../../components/PanWrapper/PanWrapper'
 import { Room } from '../../components/Room/Room'
 import { Users } from '../../components/User/Users'
+import { LocationPanel } from '../../components/LocationPanel/LocationPanel'
 import { LocalStoreLogic } from '../../store/LocalStoreLogic'
 
 export const Session = () => {
@@ -37,6 +38,7 @@ export const Session = () => {
 				<JoinButton joined={true} />
 				<MuteButton />
 			</Footer>
+                        <LocationPanel/>
 		</React.Fragment>
 	)
 }
