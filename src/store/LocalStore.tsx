@@ -3,6 +3,7 @@ import create from "zustand";
 import { Track, User } from "./ConferenceStore";
 import { panOptions, transformWrapperOptions } from "../components/PanWrapper/panOptions";
 import { mountStoreDevtool } from "simple-zustand-devtools";
+import { connectionOptions } from "../serverConfig-example";
 
 
 export type Point = {x:number, y:number}
@@ -74,6 +75,7 @@ export const useLocalStore = create<Store>((set,get) => {
   const setMyID = (id:string) => set({id:id})
 
   const onPanChange = ({scale,positionX, positionY}) => {
+    console.log('panning!')
     const viewport = {
       x: panOptions.room.size.x * scale,
       y: panOptions.room.size.y * scale,

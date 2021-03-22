@@ -24,6 +24,7 @@ const DragWrapper = ({initPos={x:0,y:0}, children, callback=(pos)=>null, current
   const element:any = useRef()
 
   const onDrag = (e) => {
+    console.log(e)
     e.preventDefault();
     e.stopPropagation();
     if (element.current !== undefined) {
@@ -43,6 +44,7 @@ const DragWrapper = ({initPos={x:0,y:0}, children, callback=(pos)=>null, current
   };
 
   const onDragTouch = (e) => {
+    console.log(e)
     e.preventDefault();
     e.stopPropagation();
     if (element.current !== undefined) {
@@ -77,9 +79,9 @@ const DragWrapper = ({initPos={x:0,y:0}, children, callback=(pos)=>null, current
   };
 
   const onDownTouch = (e) => {
+    console.log(e);
     e.preventDefault();
     e.stopPropagation();
-    console.log(e);
     const boundingRect = e.currentTarget.getBoundingClientRect();
     clickDelta.current = {
         x: Math.trunc(
@@ -94,6 +96,7 @@ const DragWrapper = ({initPos={x:0,y:0}, children, callback=(pos)=>null, current
   };
 
   const onDown = (e) => {
+    console.log(e)
     e.preventDefault();
     const boundingRect = e.currentTarget.getBoundingClientRect();
     clickDelta.current = {
