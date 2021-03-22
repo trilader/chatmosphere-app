@@ -12,6 +12,7 @@ import { PanWrapper } from '../../components/PanWrapper/PanWrapper'
 import { Room } from '../../components/Room/Room'
 import { Users } from '../../components/User/Users'
 import { LocationPanel } from '../../components/LocationPanel/LocationPanel'
+import { ScreenSharing } from '../../components/Footer/ScreenSharing/ScreenSharing'
 import { LocalStoreLogic } from '../../store/LocalStoreLogic'
 
 export const Session = () => {
@@ -35,6 +36,7 @@ export const Session = () => {
 				</Room>
 			</PanWrapper>
 			<Footer>
+                <ScreenSharing/>
 				<JoinButton joined={true} />
 				<MuteButton />
 			</Footer>

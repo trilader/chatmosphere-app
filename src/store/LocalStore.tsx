@@ -32,6 +32,7 @@ export const useLocalStore = create<Store>((set,get) => {
     audio:undefined,
     pos:panOptions.user.initialPosition,
     pan: {x:transformWrapperOptions.defaultPositionX || 0,y: transformWrapperOptions.defaultPositionY || 0},
+    zoom: false,
     scale:1,
   }
 

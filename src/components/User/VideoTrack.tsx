@@ -16,12 +16,17 @@ const Video = styled.video`
   transform: scaleX(-1);
 `
 
-export const VideoTrack:React.FC<{id:number}> = React.memo(({id}) => {
+export const VideoTrack:React.FC<{id:string}> = React.memo(({id}) => {
 
   const videoTrack = useConferenceStore(useCallback(store => store.users[id].video, [id]))
   const myRef:any = useRef()
 
   const localVideoTrack = useLocalStore((store) => store.video)
+
+  const linkMain = useConferenceStore(useCallback(store => store.users[id]['linkMain'],[id]))
+  const zoom = useConferenceStore(useCallback(store => store.users[id]['zoom'],[id]))
+  const setZoom = useConferenceStore(useCallback(store => { return () => store.setZoom(id, true) },[id]))
+  const setZoomOff = useConferenceStore(useCallback(store => { return () => store.setZoom(id, false) },[id]))
 
   //For some reason; when camera permission is not granted yet, not only the local video track, but also the remote video tracks aren't rendered.
   //The solution is to reattach the remote tracks once local track is available.
@@ -40,8 +45,21 @@ export const VideoTrack:React.FC<{id:number}> = React.memo(({id}) => {
     videoTrack?.attach(e.target)
   }
 
-  return (
-    <Video autoPlay={true} ref={myRef} className={`remoteTrack videoTrack ${id}video`} id={`${id}video`} />
-  )
+  if (linkMain) {
+    if (!zoom) {
+      return (
+        <video autoPlay={true} ref={myRef} className={`remoteTrack videoTrack ${id}video screenshare-default`} id={`${id}video`} onClick={setZoom} />
+      )
+    } else {
+      return (
+        <video autoPlay={true} ref={myRef} className={`remoteTrack videoTrack ${id}video screenshare-zoom`} id={`${id}video`} onClick={setZoomOff} />
+      )
+    }
+
+  } else {
+    return (
+      <Video autoPlay={true} ref={myRef} className={`remoteTrack videoTrack ${id}video`} id={`${id}video`} />
+    )
+  }
 })
 

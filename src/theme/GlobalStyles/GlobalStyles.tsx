@@ -65,6 +65,19 @@ export const GlobalStyles = createGlobalStyle<{theme:ITheme}>`
     cursor: default;
   }
 
+  .screenshare-default {
+    background: none;
+    width: 200px;
+    height: 200px;
+    object-position: 50% 50%;
+    display: block;
+  }
+
+  .screenshare-zoom {
+    background: none;
+    display: block;
+  }
+
   .react-transform-component{
     width: 100vw  !important;
     height: 100vh !important;

@@ -34,7 +34,9 @@ export type Track = {
 export type AudioTrack = Track
 export type VideoTrack = Track 
 
-export type User = { id:ID, user?:any, mute:boolean, volume:number, pos:Point, audio?:AudioTrack, video?:VideoTrack }
+export type User = { id:ID, user?:any, mute:boolean, volume:number, pos:Point, audio?:AudioTrack, video?:VideoTrack
+    , linkMain?:string, zoom: boolean
+}
 type Users = { [id:string]:User }
 type Point = {x:number, y:number}
 type ID = string
@@ -64,6 +66,7 @@ type ConferenceActions = {
   join: () => void
   leave: () => void
   setConferenceName: (name:string) => boolean
+  setZoom: (id:ID, val:boolean) => void
 }
 
 type UserActions = {
@@ -89,7 +92,7 @@ export const useConferenceStore = create<ConferenceStore>((set,get) => {
 
   // Private Helper Functions *******************************************
   const _addUser = (id:ID, user?:any) :void => produceAndSet (newState => {
-    newState.users[id] = {id:id, user:user, mute:false, volume:1, pos: panOptions.user.initialPosition }
+    newState.users[id] = {id:id, user:user, mute:false, volume:1, pos: panOptions.user.initialPosition, zoom: false }
   })
   const _removeUser = (id:ID) :void => produceAndSet (newState => {
     delete newState.users[id]
@@ -116,6 +119,13 @@ export const useConferenceStore = create<ConferenceStore>((set,get) => {
   }
   const _updateUserPosition = (id:ID, pos:Point):void => produceAndSet (newState => {
     if(newState.users[id]) newState.users[id]['pos'] = pos
+  })
+  const _onLinkReceived = (e:any):void => {
+    const link = JSON.parse(e.value)
+    _updateUserLink(link.id, link.main)
+  }
+  const _updateUserLink = (id:ID, main:string):void => produceAndSet (newState => {
+    if(newState.users[id]) newState.users[id]['linkMain'] = main
   })
   const _onTrackMuteChanged = (track:Track):void => {
     if(track.getType() === 'video') return
@@ -173,6 +183,7 @@ export const useConferenceStore = create<ConferenceStore>((set,get) => {
       // conference.on(JitsiMeetJS.events.conference.TRACK_AUDIO_LEVEL_CHANGED, on_remote_track_audio_level_changed);
       //conference.on(JitsiMeetJS.events.conference.PHONE_NUMBER_CHANGED, onPhoneNumberChanged);
       conference.addCommandListener("pos", _onPositionReceived)
+      conference.addCommandListener("link", _onLinkReceived)
       // r.on(JitsiMeetJS.events.conference.PARTICIPANT_PROPERTY_CHANGED, (e) => console.log("Property Changed ", e))
       window.addEventListener('beforeunload', leave) //does this help?  
       window.addEventListener('unload', leave) //does this help?
@@ -215,6 +226,10 @@ export const useConferenceStore = create<ConferenceStore>((set,get) => {
     })
   })
 
+  const setZoom = (id:ID, val:boolean):void => produceAndSet (newState => {
+    if(newState.users[id]) newState.users[id].zoom = val
+  })
+
   // Return Object *******************************************
   return {
     ...initialState,
@@ -224,7 +239,8 @@ export const useConferenceStore = create<ConferenceStore>((set,get) => {
     setConferenceName,
     setDisplayName,
     calculateVolume,
-    calculateVolumes
+    calculateVolumes,
+    setZoom
   }
 })
 
