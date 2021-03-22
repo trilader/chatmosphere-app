@@ -6,6 +6,7 @@ import { AudioTrack } from './AudioTrack';
 import { MuteIndicator } from './MuteIndicator';
 import { VideoTrack } from './VideoTrack';
 import { NameTag } from '../NameTag/NameTag';
+import { FaSearchPlus, FaSearchMinus } from 'react-icons/fa'
 
 
 export const User = ({id, user}) => {
@@ -16,16 +17,20 @@ export const User = ({id, user}) => {
   let isMute = useConferenceStore(useCallback(store => store.users[id]['mute'],[id]))
   const calculateVolume = useConferenceStore(useCallback(store => store.calculateVolume, []))
 
+  const zoom = useConferenceStore(useCallback(store => store.users[id]['zoom'],[id]))
+  const setZoom = useConferenceStore(useCallback(store => { return () => store.setZoom(id, true) },[id]))
+  const setZoomOff = useConferenceStore(useCallback(store => { return () => store.setZoom(id, false) },[id]))
+
   const users = useConferenceStore(useCallback(store => store.users, [id]))
   let showReloadHint = true;
   if (linkMain && users[linkMain]) {
-    myPos = {x: users[linkMain]['pos'].x + 150, y: users[linkMain]['pos'].y - 100};
+    myPos = {x: users[linkMain]['pos'].x + 150, y: users[linkMain]['pos'].y + 100};
     showReloadHint = false;
   }
 
   const localStore = useLocalStore();
   if (linkMain === localStore.id) {
-    myPos = {x: localStore['pos'].x + 150, y: localStore['pos'].y - 100};
+    myPos = {x: localStore['pos'].x + 150, y: localStore['pos'].y + 100};
     showReloadHint = false;
   }
 
@@ -34,16 +39,32 @@ export const User = ({id, user}) => {
     calculateVolume(id)
   },[id, calculateVolume, myPos])
 
-  return(
-    <div style={{position:'absolute', left:`${myPos.x}px`, top:`${myPos.y}px`}} className="userContainer" >
-      <VideoTrack id={id} />
-      {showReloadHint && <ReloadHint />}
-      <AudioTrack id={id} volume={myVolume} />
-      <NameTag>{user?.user?._displayName || 'Friendly Sphere'}</NameTag>
-      <div>Volume {Math.round(myVolume * 11)}</div>
-      {isMute && <MuteIndicator>🤭</MuteIndicator>}
-    </div>
-  )
+
+
+  if (showReloadHint) {
+    return(
+        <div style={{position:'absolute', left:`${myPos.x}px`, top:`${myPos.y}px`}} className="userContainer" >
+        <VideoTrack id={id} />
+        <ReloadHint />
+        <AudioTrack id={id} volume={myVolume} />
+        <NameTag>{user?.user?._displayName || 'Friendly Sphere'}</NameTag>
+        <div>Volume {Math.round(myVolume * 11)}</div>
+        {isMute && <MuteIndicator>🤭</MuteIndicator>}
+        </div>
+    )
+  } else {
+    const ZoomIconStyle = {
+        position: 'absolute',
+        left: '-20px',
+        top: '0px'
+    };
+    return(
+        <div style={{position:'absolute', left:`${myPos.x}px`, bottom:`${myPos.y}px`, zIndex: 10}} className="userContainer" >
+        <VideoTrack id={id} />
+        { zoom ? <FaSearchMinus style={ZoomIconStyle} onClick={setZoomOff} /> : <FaSearchPlus style={ZoomIconStyle} onClick={setZoom} /> }
+        </div>
+    )
+  }
 }
 
 

@@ -68,7 +68,7 @@ export const GlobalStyles = createGlobalStyle<{theme:ITheme}>`
   .screenshare-default {
     background: none;
     width: 200px;
-    height: 200px;
+    max-height: 200px;
     object-position: 50% 50%;
     display: block;
   }

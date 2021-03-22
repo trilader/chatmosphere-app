@@ -48,11 +48,11 @@ export const VideoTrack:React.FC<{id:string}> = React.memo(({id}) => {
   if (linkMain) {
     if (!zoom) {
       return (
-        <video autoPlay={true} ref={myRef} className={`remoteTrack videoTrack ${id}video screenshare-default`} id={`${id}video`} onClick={setZoom} />
+        <video autoPlay={true} ref={myRef} className={`remoteTrack videoTrack ${id}video screenshare-default`} id={`${id}video`}/>
       )
     } else {
       return (
-        <video autoPlay={true} ref={myRef} className={`remoteTrack videoTrack ${id}video screenshare-zoom`} id={`${id}video`} onClick={setZoomOff} />
+        <video autoPlay={true} ref={myRef} className={`remoteTrack videoTrack ${id}video screenshare-zoom`} id={`${id}video`}/>
       )
     }
 
