@@ -24,19 +24,23 @@ export const User = ({id, user}) => {
   const users = useConferenceStore(useCallback(store => store.users, [id]))
   let showReloadHint = true;
   if (linkMain && users[linkMain]) {
-    myPos = {x: users[linkMain]['pos'].x + 150, y: users[linkMain]['pos'].y + 100};
+    myPos = {x: users[linkMain]['pos'].x + 150, y: users[linkMain]['pos'].y - 100};
     showReloadHint = false;
   }
 
   const localStore = useLocalStore();
   if (linkMain === localStore.id) {
-    myPos = {x: localStore['pos'].x + 150, y: localStore['pos'].y + 100};
+    myPos = {x: localStore['pos'].x + 150, y: localStore['pos'].y - 100};
     showReloadHint = false;
   }
 
 
   useEffect(() => {
-    calculateVolume(id)
+    try {
+        calculateVolume(id);
+    } catch (e) {
+        console.log(e);
+    }
   },[id, calculateVolume, myPos])
 
 
@@ -59,7 +63,7 @@ export const User = ({id, user}) => {
         top: '0px'
     };
     return(
-        <div style={{position:'absolute', left:`${myPos.x}px`, bottom:`${myPos.y}px`, zIndex: 10}} className="userContainer" >
+        <div style={{position:'absolute', left:`${myPos.x}px`, top:`${myPos.y}px`, zIndex: 10}} className="userContainer" >
         <VideoTrack id={id} />
         { zoom ? <FaSearchMinus style={ZoomIconStyle} onClick={setZoomOff} /> : <FaSearchPlus style={ZoomIconStyle} onClick={setZoom} /> }
         </div>

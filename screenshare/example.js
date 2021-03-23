@@ -95,6 +95,13 @@ function connectToRoom() {
     room.on(JitsiMeetJS.events.conference.USER_JOINED, id => {
         console.log('user join');
     });
+    room.on(JitsiMeetJS.events.conference.USER_LEFT, id => {
+        if (id === linkPrimary) {
+            console.log('link primary left, leaving as well');
+            stopSharing();
+        }
+    });
+
     isConnected = true;
     if (localTrack !== null) {
         room.join();
@@ -202,8 +209,29 @@ JitsiMeetJS.mediaDevices.addEventListener(
 
 connection.connect();
 
-JitsiMeetJS.createLocalTracks({ devices: [ 'desktop' ] })
-    .then(onLocalTracks)
-    .catch(error => {
-        throw error;
-    });
+window.onload = () => {
+
+    try {
+        JitsiMeetJS.createLocalTracks({ devices: [ 'desktop' ] })
+            .then(onLocalTracks)
+            .catch(error => {
+                var elem = document.createElement('div');
+                elem.innerText = "click to start";
+
+                elem.style.cssText = 'position:absolute; width:100%; height:100%; z-index:100; background: rgba(0, 0, 0, 0.3) none repeat scroll 0% 0%; top: 0px; left: 0px; text-align: center; vertical-align: middle; padding: 60pt;';
+                document.body.appendChild(elem);
+
+                elem.onclick = () => {
+                    document.body.removeChild(elem);
+                    JitsiMeetJS.createLocalTracks({ devices: [ 'desktop' ] })
+                        .then(onLocalTracks)
+                        .catch(error => {
+                            throw e;
+                        });
+
+                }
+            });
+    } catch (e) {
+    }
+
+}
