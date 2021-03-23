@@ -11,7 +11,7 @@ const Video = styled.video`
   height: 200px;
   object-position: 50% 50%;
   display: block;
-  border-radius: 100px;
+  border-radius: 15px;
   object-fit: cover;
   transform: scaleX(-1);
 `
