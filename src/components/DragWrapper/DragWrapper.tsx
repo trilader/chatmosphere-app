@@ -123,7 +123,7 @@ const DragWrapper = ({initPos={x:0,y:0}, children, callback=(pos)=>null, current
 
   return (
     //   #onMouseDown={onDown}
-    <DragElement ref={element}  onTouchStartCapture={onDownTouch}  id="DragElement">
+    <DragElement ref={element} onMouseDown={onDown} onTouchStartCapture={onDownTouch}  id="DragElement">
       {children}
     </DragElement>
   )
