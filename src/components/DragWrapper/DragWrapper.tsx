@@ -1,4 +1,4 @@
-
+import {useConferenceStore} from './../../store/ConferenceStore'
 import React, { useEffect, useRef } from 'react'
 import styled from 'styled-components'
 
@@ -20,11 +20,14 @@ const DragElement = styled.div`
 `
 
 const DragWrapper = ({initPos={x:0,y:0}, children, callback=(pos)=>null, currentScale = 1, panOffset}:DragProps) => {
+  const conferenceStore = useConferenceStore();
+  
   panOffset = panOffset || {x:0,y:0}
   const clickDelta:any = useRef()
   const element:any = useRef()
 
   const onDrag = (e) => {
+    
     e.preventDefault();
     e.stopPropagation();
     if (element.current !== undefined) {
@@ -34,13 +37,39 @@ const DragWrapper = ({initPos={x:0,y:0}, children, callback=(pos)=>null, current
         const yPos = Math.trunc(
             e.clientY / currentScale - clickDelta.current.y
         );
+        
+
         // element?.current?.setAttribute('style', `left:${xPos}px; top:${yPos}px`)
        sharedUpdate(xPos,yPos)
     }
   };
 
 
+
+
   const sharedUpdate = (xPos,yPos) => {
+    const positions = Object.entries(conferenceStore.users).map(user =>  { return {position: user[1].pos, userId :user[1].id} })
+
+    // positions.forEach(pos => console.log(`overlaps: ${Math.sqrt((xPos-pos.x)**2 + (yPos-pos.y)**2)<283}  ${xPos-pos.x}, ${yPos-pos.y} distance = ${Math.sqrt((xPos-pos.x)**2 + (yPos-pos.y)**2)}   `))
+    
+    positions.forEach(pos => {
+      const distance = 233
+      if(Math.sqrt((xPos-pos.position.x)**2 + (yPos-pos.position.y)**2)<distance){
+        // console.log(`${xPos-pos.position.x}, ${yPos-pos.position.y}`)
+        // console.log(Math.sqrt((xPos-pos.position.x)**2 + (yPos-pos.position.y)**2))
+        const distanceToGain= distance - Math.sqrt((xPos-pos.position.x)**2 + (yPos-pos.position.y)**2)
+        const x = (xPos-pos.position.x)/Math.sqrt((xPos-pos.position.x)**2 + (yPos-pos.position.y)**2)
+        const y = (yPos-pos.position.y)/Math.sqrt((xPos-pos.position.x)**2 + (yPos-pos.position.y)**2)
+        // console.log(x,y)
+        xPos = xPos + x*distanceToGain
+        yPos = yPos + y*distanceToGain
+
+        // console.log(`overlaps: ${Math.sqrt((xPos-pos.position.x)**2 + (yPos-pos.position.y)**2)<283}  ${xPos-pos.position.x}, ${yPos-pos.position.y}   `)
+        // console.log(`overlaps: ${pos.userId}  `)
+      }
+      }
+      )
+    // conferenceStore.users.map(user =>  user.pos)
     element?.current?.setAttribute(
       'style',
       `transform:translate(${xPos}px, ${yPos}px);`
