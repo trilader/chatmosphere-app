@@ -35,13 +35,20 @@ const DragWrapper = ({initPos={x:0,y:0}, children, callback=(pos)=>null, current
             e.clientY / currentScale - clickDelta.current.y
         );
         // element?.current?.setAttribute('style', `left:${xPos}px; top:${yPos}px`)
-        element?.current?.setAttribute(
-            'style',
-            `transform:translate(${xPos}px, ${yPos}px);`
-        );
-        callback({ x: xPos, y: yPos });
+       sharedUpdate(xPos,yPos)
     }
   };
+
+
+  const sharedUpdate = (xPos,yPos) => {
+    element?.current?.setAttribute(
+      'style',
+      `transform:translate(${xPos}px, ${yPos}px);`
+  );
+  callback({ x: xPos, y: yPos });
+
+
+  }
 
 
 
@@ -60,17 +67,19 @@ const DragWrapper = ({initPos={x:0,y:0}, children, callback=(pos)=>null, current
   const onDragTouch = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    // console.log(`current : ${clickDelta.current.x}, ${clickDelta.current.y}`)
-    // console.log(`screen position : ${e.touches[0].screenX}, ${e.touches[0].screenY}`)
+
     if (element.current !== undefined) {
         const xPos = Math.trunc(-clickDelta.current.x + e.touches[0].screenX/currentScale)
         const yPos = Math.trunc(-clickDelta.current.y + (e.touches[0].screenY)/currentScale)
-        element?.current?.setAttribute(
-            'style',
-            `transform:translate(${xPos}px, ${yPos}px);`
-        );
-        console.log({ x: xPos, y: yPos });
-        callback({ x: xPos, y: yPos });
+
+        sharedUpdate(xPos,yPos)
+
+        // element?.current?.setAttribute(
+        //     'style',
+        //     `transform:translate(${xPos}px, ${yPos}px);`
+        // );
+        // console.log({ x: xPos, y: yPos });
+        // callback({ x: xPos, y: yPos });
     }
   };
 
