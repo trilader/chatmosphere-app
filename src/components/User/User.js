@@ -60,7 +60,8 @@ export const User = ({id, user}) => {
     const ZoomIconStyle = {
         position: 'absolute',
         left: '-20px',
-        top: '0px'
+        top: '0px',
+        cursor: 'pointer'
     };
     return(
         <div style={{position:'absolute', left:`${myPos.x}px`, top:`${myPos.y}px`, zIndex: 10}} className="userContainer" >
