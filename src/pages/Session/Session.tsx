@@ -20,9 +20,7 @@ export const Session = () => {
 		<React.Fragment>
 			<ErrorHandler />
 			<Info>
-				Welcome to our Prototype
-				<br />
-				Please use <b>Safari</b> or <b>Chrome</b> for now for a stable Experience
+				Welcome
 			</Info>
 			<Header>Chatmosphere</Header>
 			<JitsiConnection />

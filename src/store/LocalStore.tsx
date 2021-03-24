@@ -34,6 +34,7 @@ export const useLocalStore = create<Store>((set,get) => {
     pos:panOptions.user.initialPosition,
     pan: {x:transformWrapperOptions.defaultPositionX || 0,y: transformWrapperOptions.defaultPositionY || 0},
     zoom: false,
+    chatmoClient: false,
     scale:1,
   }
 
@@ -75,7 +76,6 @@ export const useLocalStore = create<Store>((set,get) => {
   const setMyID = (id:string) => set({id:id})
 
   const onPanChange = ({scale,positionX, positionY}) => {
-    console.log('panning!')
     const viewport = {
       x: panOptions.room.size.x * scale,
       y: panOptions.room.size.y * scale,

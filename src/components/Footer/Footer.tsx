@@ -10,7 +10,6 @@ export const Footer: React.FC = ({ children }) => {
       <CallControlBox>
        {children}
       </CallControlBox>
-      <SocialIcons />
     </>
   )
 }

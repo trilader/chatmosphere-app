@@ -35,7 +35,7 @@ export type AudioTrack = Track
 export type VideoTrack = Track 
 
 export type User = { id:ID, user?:any, mute:boolean, volume:number, pos:Point, audio?:AudioTrack, video?:VideoTrack
-    , linkMain?:string, zoom: boolean
+    , linkMain?:string, zoom: boolean, chatmoClient: boolean
 }
 type Users = { [id:string]:User }
 type Point = {x:number, y:number}
@@ -92,7 +92,7 @@ export const useConferenceStore = create<ConferenceStore>((set,get) => {
 
   // Private Helper Functions *******************************************
   const _addUser = (id:ID, user?:any) :void => produceAndSet (newState => {
-    newState.users[id] = {id:id, user:user, mute:false, volume:1, pos: panOptions.user.initialPosition, zoom: false }
+    newState.users[id] = {id:id, user:user, mute:false, volume:1, pos: panOptions.user.initialPosition, zoom: false, chatmoClient: false }
   })
   const _removeUser = (id:ID) :void => produceAndSet (newState => {
     delete newState.users[id]
@@ -118,7 +118,10 @@ export const useConferenceStore = create<ConferenceStore>((set,get) => {
     _updateUserPosition(pos.id, {x:pos.x, y:pos.y})
   }
   const _updateUserPosition = (id:ID, pos:Point):void => produceAndSet (newState => {
-    if(newState.users[id]) newState.users[id]['pos'] = pos
+    if(newState.users[id]) {
+        newState.users[id]['pos'] = pos
+        newState.users[id]['chatmoClient'] = true
+    }
   })
   const _onLinkReceived = (e:any):void => {
     const link = JSON.parse(e.value)

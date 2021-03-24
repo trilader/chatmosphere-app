@@ -13,7 +13,6 @@ const Video = styled.video`
   display: block;
   border-radius: 100px;
   object-fit: cover;
-  transform: scaleX(-1);
 `
 
 export const VideoTrack:React.FC<{id:string}> = React.memo(({id}) => {
