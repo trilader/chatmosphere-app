@@ -46,6 +46,7 @@ export type IJitsiConference={
   addCommandListener: (command:string,callback:(e:any)=>void) => boolean
   sendCommand: (command:string,payload:any) => boolean
   join:()=>void
+  sendTextMessage:(text:string)=> void
   setDisplayName:(name:string)=>void
   addTrack:(track:Track)=>Promise<any>
   myUserId:()=>ID
@@ -59,6 +60,7 @@ type ConferenceStore = {
   users: Users
   displayName:string
   error:any
+  messages:Array<{user:string,message:string,time:Date}>
 } & ConferenceActions & UserActions
 
 type ConferenceActions = {
@@ -67,6 +69,7 @@ type ConferenceActions = {
   leave: () => void
   setConferenceName: (name:string) => boolean
   setZoom: (id:ID, val:boolean) => void
+  sendTextMessage:(text:string)=> void
 }
 
 type UserActions = {
@@ -86,9 +89,15 @@ export const useConferenceStore = create<ConferenceStore>((set,get) => {
     users:{},
     displayName:"Friendly Sphere",
     error:undefined,
+    messages:[]
   }
 
   const produceAndSet = (callback:(newState:ConferenceStore)=>void)=>set(state => produce(state, newState => callback(newState)))
+
+
+  const _addMessage = (id:string, message:string, date:Date): void => produceAndSet ( newState => {
+    newState.messages.push({user:id,message:message,time:date})
+  })
 
   // Private Helper Functions *******************************************
   const _addUser = (id:ID, user?:any) :void => produceAndSet (newState => {
@@ -165,6 +174,14 @@ export const useConferenceStore = create<ConferenceStore>((set,get) => {
     conference?.setDisplayName(get().displayName)
   } 
 
+  const _onMessageReceived = (id,message,time) => {
+    if (time===undefined){
+      time = new Date().toISOString();
+    }
+    time = new Date(Date.parse(time))
+    _addMessage(id,message,time)
+  }
+
   // # Public functions *******************************************
   const init = (conferenceID:string):void => {
     const JitsiMeetJS = useConnectionStore.getState().jsMeet 
@@ -182,6 +199,7 @@ export const useConferenceStore = create<ConferenceStore>((set,get) => {
       conference.on(JitsiMeetJS.events.conference.CONFERENCE_JOINED, _onConferenceJoined)
       conference.on(JitsiMeetJS.events.conference.TRACK_MUTE_CHANGED, _onTrackMuteChanged);
       conference.on(JitsiMeetJS.events.conference.CONFERENCE_ERROR, _onConferenceError);
+      conference.on(JitsiMeetJS.events.conference.MESSAGE_RECEIVED,_onMessageReceived)
       //conference.on(JitsiMeetJS.events.conference.DISPLAY_NAME_CHANGED, onUserNameChanged);
       // conference.on(JitsiMeetJS.events.conference.TRACK_AUDIO_LEVEL_CHANGED, on_remote_track_audio_level_changed);
       //conference.on(JitsiMeetJS.events.conference.PHONE_NUMBER_CHANGED, onPhoneNumberChanged);
@@ -210,6 +228,13 @@ export const useConferenceStore = create<ConferenceStore>((set,get) => {
     set({conferenceName:lName})
     return true
   }
+
+  const sendTextMessage = (message:string) =>{
+    const conference = get().conferenceObject
+    // console.log(`send: ${message}`)
+    conference?.sendTextMessage(message)
+  }
+
 
   const setDisplayName = (name) => {
     set({displayName:name})
@@ -240,6 +265,7 @@ export const useConferenceStore = create<ConferenceStore>((set,get) => {
     join,
     leave,
     setConferenceName,
+    sendTextMessage,
     setDisplayName,
     calculateVolume,
     calculateVolumes,

@@ -1,3 +1,4 @@
+import { render } from '@testing-library/react';
 import React from 'react'
 
 import styled from "styled-components"
@@ -10,6 +11,8 @@ const InfoPanelWrapper = styled.div`
 	left: 0px;
 	text-align: initial;
 `
+
+
 
 const InfoPanel = () => {
 	const { pos, user } = useLocalStore()
@@ -25,9 +28,54 @@ const InfoPanel = () => {
 }
 
 export const LocationPanel = () => {
+	const conferenceStore = useConferenceStore();
+	const localStore = useLocalStore();
+	let value;
+	// const sendMessage = () => {
+	// 	conferenceStore.sendTextMessage(localStore.text)
+	//   }
+	
+	  const onInputChange = (e) =>{
+		localStore.setLocalText(e.target.value)
+	}
+
+	const onkeydown = (e) => {
+		if (e.keyCode == 13){
+			conferenceStore.sendTextMessage(localStore.text)
+			localStore.setLocalText('')
+			value = ''
+		}
+	}
+
+
+
 	return (
 		    <InfoPanelWrapper>
+				 
+				<input type="text" placeholder='Enter Text to Chat' onChange={onInputChange} onKeyDown={onkeydown}  value={localStore.text} />
+      {/* <button onClick= {sendMessage}> send Message </button> */}
+	  			<ChatMessagePanel />
 			    <InfoPanel/>
-                    </InfoPanelWrapper>
+			</InfoPanelWrapper>
                )
 }
+
+
+const ChatMessagePanel = () => {
+	const conferenceStore = useConferenceStore();
+	return (
+		<>
+		  <div style={{border:"solid",backgroundColor:'grey', height:'200px', overflow:'scroll'}  } >
+	{ conferenceStore.messages.map(messageObj => {
+		      		return(
+				  <div>{messageObj.time.toISOString()}:{messageObj.user}:{messageObj.message}</div>
+			 )
+		   	 })}</div>
+		</>)
+}
+
+
+// {/* {conferenceStore.messages.forEach((value)=> ChatMessageView(value.user,value.message,value.time) )} */}
+// export const ChatMessageView = (id:string,message:string,time:Date) => {
+// 	render(<p  className="chatmessage" > {time.toISOString()}:{id}:{message} </p>)
+// }

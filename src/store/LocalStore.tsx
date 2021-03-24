@@ -16,11 +16,13 @@ type ZoomPan = {
 } 
 
 type Store = {
+  setLocalText: (newText:string) => void
   setLocalPosition: (newPosition:Point) => void
   setLocalTracks: (tracks:Track[]) => void
   toggleMute: () => void
   clearLocalTracks: () => void
   setMyID: (id:string) => void
+  text:string
 } & User & ZoomPan
 
 export const useLocalStore = create<Store>((set,get) => {
@@ -36,6 +38,7 @@ export const useLocalStore = create<Store>((set,get) => {
     zoom: false,
     chatmoClient: false,
     scale:1,
+    text:''
   }
 
   // # Private Functions
@@ -45,6 +48,10 @@ export const useLocalStore = create<Store>((set,get) => {
   // # Public Functions
   const setLocalPosition = (newPosition) => {
     set({pos:newPosition})
+  }
+
+  const setLocalText = (newText:string)=>  {
+    set({text:newText})
   }
   
   const toggleMute = () => {
@@ -98,7 +105,8 @@ export const useLocalStore = create<Store>((set,get) => {
   toggleMute,
   clearLocalTracks,
   setMyID,
-  onPanChange
+  onPanChange,
+  setLocalText
 }
 })
 
