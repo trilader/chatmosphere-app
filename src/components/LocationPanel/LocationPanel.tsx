@@ -60,7 +60,6 @@ const MiniMap = () => {
 		const roomSize = panOptions.room.size;
 		const radius = 5;
 		const drawPos = (pos, color, radius, ellipse) => {
-			console.log("draw", pos, color, radius);
 			ctx.fillStyle = color;
 			const px = pos.x / roomSize.x * canvasWidth;
 			const py = pos.y / roomSize.y * canvasHeight;
