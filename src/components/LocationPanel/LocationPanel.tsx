@@ -122,13 +122,44 @@ export const LocationPanel = () => {
 
 const ChatMessagePanel = () => {
 	const conferenceStore = useConferenceStore();
+	// Object.entries(useConferenceStore().users)
+	const userMap = new Map<string,string>();
+	Object.entries(useConferenceStore().users).map(user => {userMap.set(user[0],user[1].user._displayName)})
+	console.log(userMap.size)
 	return (
 		<>
-		  <div style={{border:"solid",borderRadius:'5px',backgroundColor:'white', height:'200px', overflow:'auto'}  } >
+		  <div style={{border:"solid",borderRadius:'5px',backgroundColor:'white', height:'200px', overflow:'auto', maxWidth:'350px'}  } >
 	{ conferenceStore.messages.map(messageObj => {
 		      		return(
-				  <div>{messageObj.time.getHours()}:{messageObj.time.getMinutes()}:{messageObj.time.getSeconds()} {messageObj.user}:{messageObj.message}</div>
+				  <div>{messageObj.time.getHours().toString().padStart(2,'0')}:
+				  {messageObj.time.getMinutes().toString().padStart(2,'0')}:
+				  { messageObj.time.getSeconds().toString().padStart(2,'0')}
+				  {userMap.has(messageObj.user)?userMap.get(messageObj.user):messageObj.user}:
+				  
+				  
+				  {validURL(messageObj.message)?LinkMessage(messageObj.message):messageObj.message}</div>
 			 )
 		   	 })}</div>
 		</>)
+}
+function validURL(str) {
+	var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+	  '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+	  '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+	  '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+	  '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+	  '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+	return !!pattern.test(str);
+  }
+  
+
+const LinkMessage = (message) => {
+
+	return (<>
+	<a href={message}>{message}</a>:
+	</>
+	
+	
+	
+	)
 }
