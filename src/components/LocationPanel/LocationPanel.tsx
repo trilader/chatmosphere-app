@@ -153,13 +153,6 @@ function validURL(str) {
   }
   
 
-const LinkMessage = (message) => {
-
-	return (<>
-	<a href={message}>{message}</a>:
-	</>
-	
-	
-	
-	)
+const LinkMessage = (message: string) => {
+	return (<a target="_blank" href={message}>{message}</a>);
 }
