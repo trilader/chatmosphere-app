@@ -1,14 +1,42 @@
-import React, { useEffect, useState } from 'react'
+import React, { memo, useEffect, useRef, useState } from 'react'
+import styled from 'styled-components';
+
 import JitsiConnection from '../../components/JitsiConnection/JitsiConnection'
 import { ErrorHandler } from '../../components/common/Info/ErrorHandler'
 import { useConnectionStore } from './../../store/ConnectionStore'
-import { useConferenceStore } from './../../store/ConferenceStore'
+import { useConferenceStore, VideoTrack } from './../../store/ConferenceStore';
 import {useParams} from 'react-router-dom'
-import { Localuser } from '../../components/Localuser/Localuser'
-import { UserDragContainer } from '../../components/Localuser/LocalUserContainer'
-import { PanWrapper } from '../../components/PanWrapper/PanWrapper'
-import { Room } from '../../components/Room/Room'
 import { useLocalStore } from '../../store/LocalStore'
+
+const Video = styled.video`
+  width: 100%;
+  height: 100%;
+  object-position: 50% 50%;
+  display: block;
+  object-fit: cover;
+`
+
+const ScreenShareVideo:React.FC<{track:VideoTrack}> = memo(({track}) => {
+  const myRef:any = useRef()
+  const room = useConferenceStore(store => store.conferenceObject)
+
+  useEffect(()=> {
+    const el = myRef.current
+    if(track?.containers?.length === 0) track.attach(el)
+    return (() => {
+      track.detach(el)
+    })
+  },[track])
+
+  useEffect(() => {
+    room?.addTrack(track)
+      .catch(error => {});//the track might have been added already, handle the promise error
+  },[room, track])
+
+  return (
+    <Video autoPlay={true} ref={myRef} className={`localTrack videoTrack`}/>
+  )
+})
 
 export const ScreenShare = () => {
   const conference = useConferenceStore(state => state.conferenceObject)
@@ -18,6 +46,7 @@ export const ScreenShare = () => {
   const conferenceIsJoined = useConferenceStore(store => store.isJoined)
   let {id, displayName, linkPrimary} = useParams() //get Id from url, should error check here I guess
 
+  const videoTrack = useLocalStore((store) => store.video)
 
   useEffect(() => {
     initJitsiMeet()
@@ -48,8 +77,10 @@ export const ScreenShare = () => {
       <button onClick={startSharing}>HELLO!</button>
       <ErrorHandler />
       <JitsiConnection />
-      <Localuser audioRadius />
 
+      {videoTrack && (
+        <ScreenShareVideo key={videoTrack.track.id} track={videoTrack} />
+      )}
     </React.Fragment>
   )
 }
