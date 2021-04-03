@@ -42,7 +42,11 @@ export const ScreenShare = () => {
   const conference = useConferenceStore(state => state.conferenceObject)
   const setLocalTracks = useLocalStore(store => store.setLocalTracks)
   const initJitsiMeet = useConnectionStore(store => store.initJitsiMeet)
+  const disconnectServer = useConnectionStore(store => store.disconnectServer)
   const jsMeet = useConnectionStore(store => store.jsMeet)
+  const connectServer = useConnectionStore(store => store.connectServer)
+  const connected = useConnectionStore(store => store.connected)
+  const initConference = useConferenceStore(store => store.init)
   const conferenceIsJoined = useConferenceStore(store => store.isJoined)
   let {id, displayName, linkPrimary} = useParams() //get Id from url, should error check here I guess
 
@@ -51,6 +55,17 @@ export const ScreenShare = () => {
   useEffect(() => {
     initJitsiMeet()
   }, [initJitsiMeet])
+
+  useEffect(() => {
+    connectServer(id)
+    return ()=> disconnectServer()
+  },[id, connectServer, disconnectServer])
+
+  useEffect(() => {
+    if(jsMeet && connected) {
+      initConference(id)
+    }
+  },[jsMeet, connected, initConference, id])
 
   const announceAndCreateTrack = () => {
     conference?.sendCommand('link', {value: JSON.stringify({id: conference.myUserId(), main: linkPrimary})})
@@ -76,7 +91,6 @@ export const ScreenShare = () => {
     <React.Fragment>
       <button onClick={startSharing}>start video</button>
       <ErrorHandler />
-      <JitsiConnection />
 
       {videoTrack && (
         <ScreenShareVideo key={videoTrack.track.id} track={videoTrack} />
