@@ -74,7 +74,7 @@ export const ScreenShare = () => {
 
   return (
     <React.Fragment>
-      <button onClick={startSharing}>HELLO!</button>
+      <button onClick={startSharing}>start video</button>
       <ErrorHandler />
       <JitsiConnection />
 
