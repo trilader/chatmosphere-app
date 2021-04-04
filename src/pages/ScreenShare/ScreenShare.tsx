@@ -41,24 +41,17 @@ const ScreenShareVideo:React.FC<{track:VideoTrack}> = memo(({track}) => {
 
 type DesiredConnectionState = "INIT" | "SHARE" | "RESHARE"
 
-type ITrack = {
-  dispose: () => void;
-}
-
 type IScreenShareStore = {
   desiredConnectionState: DesiredConnectionState,
   linkAnnounced: boolean,
-  track: ITrack | null,
   setDesiredConnectionState: (DesiredConnectionState) => void,
   setLinkAnnounced: (boolean) => void,
-  setTrack: (ITrack) => void,
 };
 
 const useScreenShareStore = create<IScreenShareStore>((set, get) => {
   const initialState = {
     desiredConnectionState: "INIT",
     linkAnnounced: false,
-    track: null,
   } as const;
 
   const setDesiredConnectionState = (desiredConnectionState: DesiredConnectionState) => {
@@ -69,15 +62,10 @@ const useScreenShareStore = create<IScreenShareStore>((set, get) => {
     set({linkAnnounced});
   };
 
-  const setTrack = (track: ITrack) => {
-    set({track});
-  };
-
   return {
     ...initialState,
     setDesiredConnectionState,
     setLinkAnnounced,
-    setTrack,
   };
 });
 
@@ -97,14 +85,16 @@ export const ScreenShare = () => {
   const videoTrack = useLocalStore((store) => store.video)
   const desiredConnectionState = useScreenShareStore((store) => store.desiredConnectionState);
   const linkAnnounced = useScreenShareStore((store) => store.linkAnnounced);
-  const track = useScreenShareStore((store) => store.track);
   const setDesiredConnectionState = useScreenShareStore((store) => store.setDesiredConnectionState);
   const setLinkAnnounced = useScreenShareStore((store) => store.setLinkAnnounced);
-  const setTrack = useScreenShareStore((store) => store.setTrack);
 
   const announceLink = () => {
     conference?.sendCommand('link', {value: JSON.stringify({id: conference.myUserId(), main: linkPrimary})})
-
+    conference?.on(jsMeet?.events.conference.USER_LEFT, idLeft => {
+      if (idLeft === linkPrimary) {
+        setDesiredConnectionState("INIT");
+      }
+    })
     setLinkAnnounced(true);
   }
 
@@ -125,8 +115,7 @@ export const ScreenShare = () => {
   }
 
   const disposeTrack = () => {
-    track?.dispose();
-    setTrack(null);
+    videoTrack?.dispose();
   }
 
   const disposeLink = () => {
@@ -135,6 +124,10 @@ export const ScreenShare = () => {
 
   const disposeConference = () => {
     conference?.leave();
+  }
+
+  const joinConfernce = () => {
+    initConference(id);
   }
 
   const operate = () => {
@@ -149,20 +142,21 @@ export const ScreenShare = () => {
 
     if(desiredConnectionState == "SHARE"){
       if(!conferenceIsJoined){
-        initConference(id);
+        joinConfernce();
         return;
       }
       if(!linkAnnounced){
+        conference?.setDisplayName(displayName);
         announceLink();
         return;
       }
-      if(!track){
+      if(!videoTrack){
         createTrack();
         return;
       }
     }
     if(desiredConnectionState == "INIT"){
-      if(track){
+      if(videoTrack){
         disposeTrack();
         return;
       }
@@ -176,7 +170,7 @@ export const ScreenShare = () => {
       }
     }
     if(desiredConnectionState == "RESHARE"){
-      if(track){
+      if(videoTrack){
         disposeTrack();
         return;
       }
@@ -184,11 +178,13 @@ export const ScreenShare = () => {
     }
   }
 
-  useEffect(operate, [jsMeet, connected, desiredConnectionState, conferenceIsJoined, linkAnnounced, track])
+  useEffect(operate, [jsMeet, connected, desiredConnectionState, conferenceIsJoined, linkAnnounced, videoTrack])
 
   return (
     <React.Fragment>
-      <button onClick={startSharing}>start video</button>
+      {!videoTrack && (
+        <button onClick={startSharing}>start video</button>
+      )}
       <ErrorHandler />
 
       {videoTrack && (
