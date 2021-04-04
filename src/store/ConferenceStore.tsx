@@ -52,6 +52,7 @@ export type IJitsiConference={
   addTrack:(track:Track)=>Promise<any>
   myUserId:()=>ID
   leave:()=>void
+  isJoined: () => boolean
 }
 
 type ConferenceStore = {
