@@ -6,7 +6,7 @@ import JitsiConnection from '../../components/JitsiConnection/JitsiConnection'
 import { ErrorHandler } from '../../components/common/Info/ErrorHandler'
 import { useConnectionStore } from './../../store/ConnectionStore'
 import { useConferenceStore, VideoTrack } from './../../store/ConferenceStore';
-import {useParams} from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { useLocalStore } from '../../store/LocalStore'
 
 const Video = styled.video`
@@ -17,25 +17,25 @@ const Video = styled.video`
   object-fit: cover;
 `
 
-const ScreenShareVideo:React.FC<{track:VideoTrack}> = memo(({track}) => {
-  const myRef:any = useRef()
+const ScreenShareVideo: React.FC<{ track: VideoTrack }> = memo(({ track }) => {
+  const myRef: any = useRef()
   const room = useConferenceStore(store => store.conferenceObject)
 
-  useEffect(()=> {
+  useEffect(() => {
     const el = myRef.current
-    if(track?.containers?.length === 0) track.attach(el)
+    if (track?.containers?.length === 0) track.attach(el)
     return (() => {
       track.detach(el)
     })
-  },[track])
+  }, [track])
 
   useEffect(() => {
     room?.addTrack(track)
-      .catch(error => {});//the track might have been added already, handle the promise error
-  },[room, track])
+      .catch(error => { });//the track might have been added already, handle the promise error
+  }, [room, track])
 
   return (
-    <Video autoPlay={true} ref={myRef} className={`localTrack videoTrack`}/>
+    <Video autoPlay={true} ref={myRef} className={`localTrack videoTrack`} />
   )
 })
 
@@ -55,11 +55,11 @@ const useScreenShareStore = create<IScreenShareStore>((set, get) => {
   } as const;
 
   const setDesiredConnectionState = (desiredConnectionState: DesiredConnectionState) => {
-    set({desiredConnectionState});
+    set({ desiredConnectionState });
   };
 
   const setLinkAnnounced = (linkAnnounced: boolean) => {
-    set({linkAnnounced});
+    set({ linkAnnounced });
   };
 
   return {
@@ -80,7 +80,7 @@ export const ScreenShare = () => {
   const connected = useConnectionStore(store => store.connected)
   const initConference = useConferenceStore(store => store.init)
   const conferenceIsJoined = useConferenceStore(store => store.isJoined)
-  let {id, displayName, linkPrimary} = useParams() //get Id from url, should error check here I guess
+  let { id, displayName, linkPrimary } = useParams() //get Id from url, should error check here I guess
 
   const videoTrack = useLocalStore((store) => store.video)
   const desiredConnectionState = useScreenShareStore((store) => store.desiredConnectionState);
@@ -89,7 +89,7 @@ export const ScreenShare = () => {
   const setLinkAnnounced = useScreenShareStore((store) => store.setLinkAnnounced);
 
   const announceLink = () => {
-    conference?.sendCommand('link', {value: JSON.stringify({id: conference.myUserId(), main: linkPrimary})})
+    conference?.sendCommand('link', { value: JSON.stringify({ id: conference.myUserId(), main: linkPrimary }) })
     conference?.on(jsMeet?.events.conference.USER_LEFT, idLeft => {
       if (idLeft === linkPrimary) {
         setDesiredConnectionState("INIT");
@@ -100,18 +100,22 @@ export const ScreenShare = () => {
 
   const createTrack = () => {
     jsMeet
-    ?.createLocalTracks({ devices: [ 'desktop' ] }, true)
-    .then(tracks => {
-      console.log(tracks);
-      setLocalTracks(tracks)
-    })
-    .catch(error => {
-      console.log(error)
-    });
+      ?.createLocalTracks({ devices: ['desktop'] }, true)
+      .then(tracks => {
+        console.log(tracks);
+        setLocalTracks(tracks)
+      })
+      .catch(error => {
+        console.log(error)
+      });
   }
 
   const trackReady = () => {
     return videoTrack && !videoTrack.disposed
+  }
+
+  const conferenceReady = () => {
+    return conference && conference.isJoined()
   }
 
   const disposeTrack = () => {
@@ -131,46 +135,47 @@ export const ScreenShare = () => {
   }
 
   const operate = () => {
-    if(!jsMeet) {
+    if (!jsMeet) {
       initJitsiMeet();
       return;
     }
-    if(!connected) {
+    if (!connected) {
       connectServer(id);
       return;
     }
 
-    if(desiredConnectionState == "SHARE"){
-      if(!conferenceIsJoined){
+    console.log(desiredConnectionState);
+    if (desiredConnectionState == "SHARE") {
+      if (conference === undefined || conference.isJoined() === null) {
         joinConfernce();
         return;
       }
-      if(!linkAnnounced){
+      if (!linkAnnounced) {
         conference?.setDisplayName(displayName);
         announceLink();
         return;
       }
-      if(!trackReady()){
+      if (!trackReady()) {
         createTrack();
         return;
       }
     }
-    if(desiredConnectionState == "INIT"){
-      if(trackReady()){
+    if (desiredConnectionState == "INIT") {
+      if (trackReady()) {
         disposeTrack();
         return;
       }
-      if(linkAnnounced){
+      if (linkAnnounced) {
         disposeLink();
         return;
       }
-      if(conferenceIsJoined){
+      if (conferenceReady()) {
         disposeConference();
         return;
       }
     }
-    if(desiredConnectionState == "RESHARE"){
-      if(trackReady()){
+    if (desiredConnectionState == "RESHARE") {
+      if (trackReady()) {
         disposeTrack();
         return;
       }
@@ -178,11 +183,15 @@ export const ScreenShare = () => {
     }
   }
 
-  useEffect(operate, [jsMeet, connected, desiredConnectionState, conferenceIsJoined, linkAnnounced, videoTrack])
+  useEffect(operate, [jsMeet, connected, desiredConnectionState, conference, linkAnnounced, videoTrack])
 
 
   const startSharing = () => {
     setDesiredConnectionState("SHARE");
+  };
+
+  const stopSharing = () => {
+    setDesiredConnectionState("INIT");
   };
 
   const reshare = () => {
@@ -191,15 +200,18 @@ export const ScreenShare = () => {
 
   return (
     <React.Fragment>
-      {!videoTrack && (
-        <button onClick={startSharing}>start video</button>
+      {!trackReady() && (
+        <button onClick={startSharing}>start sharing</button>
       )}
-      {videoTrack && (
+      {trackReady() && (
+        <button onClick={stopSharing}>stop sharing</button>
+      )}
+      {trackReady() && (
         <button onClick={reshare}>reshare</button>
       )}
       <ErrorHandler />
 
-      {videoTrack && (
+      { trackReady() && videoTrack && (
         <ScreenShareVideo key={videoTrack.track.id} track={videoTrack} />
       )}
     </React.Fragment>
