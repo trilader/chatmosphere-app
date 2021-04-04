@@ -23,6 +23,7 @@ export type Track = {
   dispose: () => Promise<void>
   isLocal: () => boolean
   isMuted: () => boolean
+  disposed: boolean
   mute: () => void
   unmute: () => void
   addEventListener: (eventType:string,callback:(...rest)=>void) => boolean
