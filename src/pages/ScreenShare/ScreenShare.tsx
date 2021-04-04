@@ -110,12 +110,12 @@ export const ScreenShare = () => {
     });
   }
 
-  const startSharing = () => {
-    setDesiredConnectionState("SHARE");
+  const trackReady = () => {
+    return videoTrack && !videoTrack.disposed
   }
 
   const disposeTrack = () => {
-    videoTrack?.dispose();
+    videoTrack?.dispose().then(operate);
   }
 
   const disposeLink = () => {
@@ -150,13 +150,13 @@ export const ScreenShare = () => {
         announceLink();
         return;
       }
-      if(!videoTrack){
+      if(!trackReady()){
         createTrack();
         return;
       }
     }
     if(desiredConnectionState == "INIT"){
-      if(videoTrack){
+      if(trackReady()){
         disposeTrack();
         return;
       }
@@ -170,7 +170,7 @@ export const ScreenShare = () => {
       }
     }
     if(desiredConnectionState == "RESHARE"){
-      if(videoTrack){
+      if(trackReady()){
         disposeTrack();
         return;
       }
@@ -180,10 +180,22 @@ export const ScreenShare = () => {
 
   useEffect(operate, [jsMeet, connected, desiredConnectionState, conferenceIsJoined, linkAnnounced, videoTrack])
 
+
+  const startSharing = () => {
+    setDesiredConnectionState("SHARE");
+  };
+
+  const reshare = () => {
+    setDesiredConnectionState("RESHARE");
+  };
+
   return (
     <React.Fragment>
       {!videoTrack && (
         <button onClick={startSharing}>start video</button>
+      )}
+      {videoTrack && (
+        <button onClick={reshare}>reshare</button>
       )}
       <ErrorHandler />
 
