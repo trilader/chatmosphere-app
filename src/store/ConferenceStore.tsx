@@ -20,7 +20,7 @@ export type Track = {
   track:{id:string}
   containers:any[]
   getType: () => 'video'|'audio'|'desktop'
-  dispose: () => void
+  dispose: () => Promise<void>
   isLocal: () => boolean
   isMuted: () => boolean
   mute: () => void
