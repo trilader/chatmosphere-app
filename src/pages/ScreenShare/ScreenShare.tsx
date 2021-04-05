@@ -112,7 +112,7 @@ export const ScreenShare = () => {
   }
 
   const conferenceReady = () => {
-    return conference && conference.isJoined()
+    return (conference !== undefined) && (conference.isJoined() !== null);
   }
 
   const disposeTrack = () => {
@@ -143,7 +143,7 @@ export const ScreenShare = () => {
 
     console.log(desiredConnectionState);
     if (desiredConnectionState == "SHARE") {
-      if (conference === undefined || conference.isJoined() === null) {
+      if (!conferenceReady()) {
         joinConfernce();
         return;
       }
