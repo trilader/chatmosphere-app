@@ -33,7 +33,7 @@ export type Track = {
   detach: (element:HTMLElement) => void
 }
 export type AudioTrack = Track
-export type VideoTrack = Track
+export type VideoTrack = Track 
 
 export type User = { id:ID, user?:any, mute:boolean, volume:number, pos:Point, audio?:AudioTrack, video?:VideoTrack
     , linkMain?:string, zoom: boolean, chatmoClient: boolean
@@ -108,7 +108,7 @@ export const useConferenceStore = create<ConferenceStore>((set,get) => {
     delete newState.users[id]
   })
   const _addAudioTrack = (id:ID, track:Track) => produceAndSet (newState => {
-    if(newState.users[id])
+    if(newState.users[id]) 
     {
       newState.users[id].audio = track
       newState.users[id]['mute'] = track.isMuted()
@@ -156,7 +156,7 @@ export const useConferenceStore = create<ConferenceStore>((set,get) => {
 
   const _onRemoteTrackAdded = (track:Track):void => {
     if(track.isLocal()) return // also run on your own tracks so exit
-    const JitsiMeetJS = useConnectionStore.getState().jsMeet
+    const JitsiMeetJS = useConnectionStore.getState().jsMeet 
     track.addEventListener(JitsiMeetJS?.events.track.LOCAL_TRACK_STOPPED,() => console.log('remote track stopped'))
     track.addEventListener(JitsiMeetJS?.events.track.TRACK_AUDIO_OUTPUT_CHANGED,deviceId =>console.log(`track audio output device was changed to ${deviceId}`))
     const id = track.getParticipantId() // get user id of track
@@ -173,7 +173,7 @@ export const useConferenceStore = create<ConferenceStore>((set,get) => {
     set({isJoined:true})//only Local User -> could be in LocalStore
     const conference = get().conferenceObject
     conference?.setDisplayName(get().displayName)
-  }
+  } 
 
   const _onMessageReceived = (id,message,time) => {
     if (time===undefined){
@@ -185,7 +185,7 @@ export const useConferenceStore = create<ConferenceStore>((set,get) => {
 
   // # Public functions *******************************************
   const init = (conferenceID:string):void => {
-    const JitsiMeetJS = useConnectionStore.getState().jsMeet
+    const JitsiMeetJS = useConnectionStore.getState().jsMeet 
     const connection = useConnectionStore.getState().connection //either move to ConnectionStore or handle undefined here
     const enteredConferenceName = conferenceID.length > 0 ? conferenceID.toLowerCase() : get().conferenceName?.toLowerCase()
     const conferenceName = process.env.REACT_APP_DEMO_SESSION || enteredConferenceName
@@ -207,7 +207,7 @@ export const useConferenceStore = create<ConferenceStore>((set,get) => {
       conference.addCommandListener("pos", _onPositionReceived)
       conference.addCommandListener("link", _onLinkReceived)
       // r.on(JitsiMeetJS.events.conference.PARTICIPANT_PROPERTY_CHANGED, (e) => console.log("Property Changed ", e))
-      window.addEventListener('beforeunload', leave) //does this help?
+      window.addEventListener('beforeunload', leave) //does this help?  
       window.addEventListener('unload', leave) //does this help?
       conference.join()
       set({conferenceObject:conference,error:undefined})
@@ -219,7 +219,7 @@ export const useConferenceStore = create<ConferenceStore>((set,get) => {
   const join = () => {
 
   }
-  const leave = () => {
+  const leave = () => { 
     const conference = get().conferenceObject
     conference?.leave()
   }
@@ -235,6 +235,7 @@ export const useConferenceStore = create<ConferenceStore>((set,get) => {
     // console.log(`send: ${message}`)
     conference?.sendTextMessage(message)
   }
+
 
   const setDisplayName = (name) => {
     set({displayName:name})
