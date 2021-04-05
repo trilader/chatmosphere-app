@@ -52,7 +52,6 @@ export type IJitsiConference={
   addTrack:(track:Track)=>Promise<any>
   myUserId:()=>ID
   leave:()=>void
-  isJoined: () => boolean
 }
 
 type ConferenceStore = {
@@ -72,7 +71,6 @@ type ConferenceActions = {
   setConferenceName: (name:string) => boolean
   setZoom: (id:ID, val:boolean) => void
   sendTextMessage:(text:string)=> void
-  startScreenShare: () => void
 }
 
 type UserActions = {
@@ -238,20 +236,6 @@ export const useConferenceStore = create<ConferenceStore>((set,get) => {
     conference?.sendTextMessage(message)
   }
 
-  const startScreenShare = () => {
-    const conference = get().conferenceObject;
-    const JitsiMeetJS = useConnectionStore.getState().jsMeet;
-    JitsiMeetJS?.createLocalTracks({ devices: [ 'desktop' ] }, false)
-            .then((tracks) => {
-              console.log(tracks);
-            }).catch((err) => {
-              console.log(err);
-            })
-
-    console.log(conference);
-  }
-
-
   const setDisplayName = (name) => {
     set({displayName:name})
     const conference = get().conferenceObject
@@ -282,7 +266,6 @@ export const useConferenceStore = create<ConferenceStore>((set,get) => {
     leave,
     setConferenceName,
     sendTextMessage,
-    startScreenShare,
     setDisplayName,
     calculateVolume,
     calculateVolumes,

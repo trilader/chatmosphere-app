@@ -77,7 +77,6 @@ export const ScreenShare = () => {
   const connectServer = useConnectionStore(store => store.connectServer)
   const connected = useConnectionStore(store => store.connected)
   const initConference = useConferenceStore(store => store.init)
-  const conferenceIsJoined = useConferenceStore(store => store.isJoined)
   let { id, displayName, linkPrimary } = useParams() //get Id from url, should error check here I guess
 
   const videoTrack = useLocalStore((store) => store.video)
