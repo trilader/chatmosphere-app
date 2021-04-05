@@ -1,8 +1,7 @@
-import React, { memo, useEffect, useRef, useState } from 'react'
+import React, { memo, useEffect, useRef } from 'react'
 import styled from 'styled-components';
 import create from "zustand"
 
-import JitsiConnection from '../../components/JitsiConnection/JitsiConnection'
 import { ErrorHandler } from '../../components/common/Info/ErrorHandler'
 import { useConnectionStore } from './../../store/ConnectionStore'
 import { useConferenceStore, VideoTrack } from './../../store/ConferenceStore';
@@ -74,7 +73,6 @@ export const ScreenShare = () => {
   const conference = useConferenceStore(state => state.conferenceObject)
   const setLocalTracks = useLocalStore(store => store.setLocalTracks)
   const initJitsiMeet = useConnectionStore(store => store.initJitsiMeet)
-  const disconnectServer = useConnectionStore(store => store.disconnectServer)
   const jsMeet = useConnectionStore(store => store.jsMeet)
   const connectServer = useConnectionStore(store => store.connectServer)
   const connected = useConnectionStore(store => store.connected)
