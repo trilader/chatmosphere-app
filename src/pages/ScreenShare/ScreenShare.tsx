@@ -99,7 +99,12 @@ export const ScreenShare = () => {
     jsMeet
       ?.createLocalTracks({ devices: ['desktop'] }, true)
       .then(tracks => {
-        console.log(tracks);
+        for(const t of tracks){
+          // set desired state to INIT, when screensharing is stopped via browser ui button "stop sharing"
+          t.addEventListener(jsMeet.events.track.LOCAL_TRACK_STOPPED, () => {
+            setDesiredConnectionState("INIT");
+          })
+        }
         setLocalTracks(tracks)
       })
       .catch(error => {
