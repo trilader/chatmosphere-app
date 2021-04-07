@@ -42,14 +42,17 @@ type DesiredConnectionState = "INIT" | "SHARE" | "RESHARE"
 type IScreenShareStore = {
   desiredConnectionState: DesiredConnectionState,
   linkAnnounced: boolean,
+  creatingTrack: boolean,
   setDesiredConnectionState: (DesiredConnectionState) => void,
   setLinkAnnounced: (boolean) => void,
+  setCreatingTrack: (boolean) => void,
 };
 
 const useScreenShareStore = create<IScreenShareStore>((set, get) => {
   const initialState = {
     desiredConnectionState: "INIT",
     linkAnnounced: false,
+    creatingTrack: false
   } as const;
 
   const setDesiredConnectionState = (desiredConnectionState: DesiredConnectionState) => {
@@ -60,10 +63,15 @@ const useScreenShareStore = create<IScreenShareStore>((set, get) => {
     set({ linkAnnounced });
   };
 
+  const setCreatingTrack = (creatingTrack: boolean) => {
+    set({ creatingTrack });
+  };
+
   return {
     ...initialState,
     setDesiredConnectionState,
     setLinkAnnounced,
+    setCreatingTrack,
   };
 });
 
@@ -81,8 +89,10 @@ export const ScreenShare = () => {
   const videoTrack = useLocalStore((store) => store.video)
   const desiredConnectionState = useScreenShareStore((store) => store.desiredConnectionState);
   const linkAnnounced = useScreenShareStore((store) => store.linkAnnounced);
+  const creatingTrack = useScreenShareStore((store) => store.creatingTrack);
   const setDesiredConnectionState = useScreenShareStore((store) => store.setDesiredConnectionState);
   const setLinkAnnounced = useScreenShareStore((store) => store.setLinkAnnounced);
+  const setCreatingTrack = useScreenShareStore((store) => store.setCreatingTrack);
 
   const announceLink = () => {
     conference?.sendCommand('link', { value: JSON.stringify({ id: conference.myUserId(), main: linkPrimary }) })
@@ -95,9 +105,13 @@ export const ScreenShare = () => {
   }
 
   const createTrack = () => {
+    if(creatingTrack) return;
+
+    setCreatingTrack(true);
     jsMeet
       ?.createLocalTracks({ devices: ['desktop'] }, true)
       .then(tracks => {
+        setCreatingTrack(false);
         for(const t of tracks){
           // set desired state to INIT, when screensharing is stopped via browser ui button "stop sharing"
           t.addEventListener(jsMeet.events.track.LOCAL_TRACK_STOPPED, () => {
@@ -107,6 +121,7 @@ export const ScreenShare = () => {
         setLocalTracks(tracks)
       })
       .catch(error => {
+        setCreatingTrack(false);
         console.log(error)
       });
   }
