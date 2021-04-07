@@ -50,9 +50,9 @@ type IScreenShareStore = {
 
 const useScreenShareStore = create<IScreenShareStore>((set, get) => {
   const initialState = {
-    desiredConnectionState: "INIT",
+    desiredConnectionState: "SHARE",
     linkAnnounced: false,
-    creatingTrack: false
+    creatingTrack: false,
   } as const;
 
   const setDesiredConnectionState = (desiredConnectionState: DesiredConnectionState) => {
@@ -122,7 +122,8 @@ export const ScreenShare = () => {
       })
       .catch(error => {
         setCreatingTrack(false);
-        console.log(error)
+        setDesiredConnectionState("INIT");
+        console.log(error);
       });
   }
 
@@ -162,6 +163,10 @@ export const ScreenShare = () => {
 
     console.log(desiredConnectionState);
     if (desiredConnectionState == "SHARE") {
+      if (!trackReady()) {
+        createTrack();
+        return;
+      }
       if (!conferenceReady()) {
         joinConfernce();
         return;
@@ -169,10 +174,6 @@ export const ScreenShare = () => {
       if (!linkAnnounced) {
         conference?.setDisplayName(displayName);
         announceLink();
-        return;
-      }
-      if (!trackReady()) {
-        createTrack();
         return;
       }
     }
