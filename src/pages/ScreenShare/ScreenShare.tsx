@@ -208,7 +208,7 @@ export const ScreenShare = () => {
         <button onClick={stopSharing}>stop sharing</button>
       )}
       {trackReady() && (
-        <button onClick={reshare}>share something different</button>
+        <button onClick={reshare}>share something else</button>
       )}
       <ErrorHandler />
 
