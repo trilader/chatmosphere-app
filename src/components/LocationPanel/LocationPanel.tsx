@@ -125,7 +125,6 @@ const ChatMessagePanel = () => {
 
 	const userMap = new Map<string,string>();
 	Object.entries(conferenceStore.users).map(user => {userMap.set(user[0],user[1].user._displayName)})
-
 	return (
 		<>
 		  <div style={{border:"solid",borderRadius:'5px',backgroundColor:'white', height:'200px', overflow:'auto', maxWidth:'350px'}  } >
@@ -137,20 +136,25 @@ const ChatMessagePanel = () => {
 				  {userMap.has(messageObj.user)?userMap.get(messageObj.user):messageObj.user}:
 				  
 				  
-				  {validURL(messageObj.message)?LinkMessage(messageObj.message):messageObj.message}</div>
+				  {isValidHttpUrl(messageObj.message)?LinkMessage(messageObj.message):messageObj.message}</div>
 			 )
 		   	 })}</div>
 		</>)
 }
-function validURL(str) {
-	var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
-	  '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
-	  '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
-	  '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
-	  '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
-	  '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
-	return !!pattern.test(str);
-  }
+
+
+function isValidHttpUrl(string) {
+	let url;
+	
+	try {
+		url = new URL(string);
+	} catch (_) {
+		return false;  
+	}
+	
+	return url.protocol === "http:" || url.protocol === "https:";
+	}	
+
   
 
 const LinkMessage = (message: string) => {
