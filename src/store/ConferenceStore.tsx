@@ -19,10 +19,11 @@ declare global {
 export type Track = {
   track:{id:string}
   containers:any[]
-  getType: () => 'video'|'audio'
-  dispose: () => void
+  getType: () => 'video'|'audio'|'desktop'
+  dispose: () => Promise<void>
   isLocal: () => boolean
   isMuted: () => boolean
+  disposed: boolean
   mute: () => void
   unmute: () => void
   addEventListener: (eventType:string,callback:(...rest)=>void) => boolean
@@ -51,6 +52,7 @@ export type IJitsiConference={
   addTrack:(track:Track)=>Promise<any>
   myUserId:()=>ID
   leave:()=>void
+  isJoined: () => boolean
 }
 
 type ConferenceStore = {

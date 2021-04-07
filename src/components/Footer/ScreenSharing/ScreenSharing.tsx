@@ -9,7 +9,7 @@ export const ScreenSharing = () => {
   const localStore = useLocalStore();
   const conferenceStore = useConferenceStore();
 
-  let link = "/screenshare/#" + conferenceStore.conferenceName + "/" + conferenceStore.displayName + "-screenshare/" + localStore.id;
+  let link = "/screenshare/" + conferenceStore.conferenceName + "/" + conferenceStore.displayName + "-screenshare/" + localStore.id;
 
   return <a target="_blank" href={link}><FaLaptop/></a>
 }
