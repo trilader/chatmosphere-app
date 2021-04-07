@@ -13,7 +13,6 @@ const Video = styled.video`
   height: 100%;
   object-position: 50% 50%;
   display: block;
-  object-fit: cover;
 `
 
 const ScreenShareVideo: React.FC<{ track: VideoTrack }> = memo(({ track }) => {
