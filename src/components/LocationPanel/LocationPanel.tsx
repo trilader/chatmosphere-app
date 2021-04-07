@@ -124,8 +124,9 @@ const ChatMessagePanel = () => {
 	const conferenceStore = useConferenceStore();
 	// Object.entries(useConferenceStore().users)
 	const userMap = new Map<string,string>();
-	Object.entries(useConferenceStore().users).map(user => {userMap.set(user[0],user[1].user._displayName)})
-	console.log(userMap.size)
+	console.log(conferenceStore.users)
+	Object.entries(conferenceStore.users).map(user => {userMap.set(user[0],user[1].user._displayName)})
+	console.log(userMap)
 	return (
 		<>
 		  <div style={{border:"solid",borderRadius:'5px',backgroundColor:'white', height:'200px', overflow:'auto', maxWidth:'350px'}  } >
