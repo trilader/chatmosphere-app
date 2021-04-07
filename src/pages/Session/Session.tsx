@@ -14,8 +14,33 @@ import { Users } from '../../components/User/Users'
 import { LocationPanel } from '../../components/LocationPanel/LocationPanel'
 import { ScreenSharing } from '../../components/Footer/ScreenSharing/ScreenSharing'
 import { LocalStoreLogic } from '../../store/LocalStoreLogic'
+import { useConferenceStore } from '../../store/ConferenceStore'
+import { useParams, useHistory } from 'react-router-dom'
+const Debug = () => {
+
+	const conferenceStore = useConferenceStore();
+	const history = useHistory()
+	const {id} = useParams()
+	React.useEffect(
+		() => {
+			console.log()
+			if (/sphere/i.test(conferenceStore.displayName)){
+				
+				history.push(`/enter/${id}`)
+			}
+			
+			
+		}
+		,[]
+	)
+	return (<></>)
+} 
+
 
 export const Session = () => {
+	
+	
+
 	return (
 		<React.Fragment>
 			<ErrorHandler />
@@ -39,6 +64,7 @@ export const Session = () => {
 				<MuteButton />
 			</Footer>
                         <LocationPanel/>
+						<Debug></Debug>
 		</React.Fragment>
 	)
 }

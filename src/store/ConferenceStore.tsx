@@ -5,7 +5,6 @@ import { conferenceOptions } from '../components/JitsiConnection/jitsiOptions';
 import { getVolumeByDistance } from '../utils/VectorHelpers';
 import { useConnectionStore } from './ConnectionStore';
 import { useLocalStore } from './LocalStore';
-
 import { panOptions } from '../components/PanWrapper/panOptions';
 
 // # TS DEFINITIONS *******************************************
@@ -51,6 +50,7 @@ export type IJitsiConference={
   setDisplayName:(name:string)=>void
   addTrack:(track:Track)=>Promise<any>
   myUserId:()=>ID
+
   leave:()=>void
   isJoined: () => boolean
 }
@@ -67,6 +67,7 @@ type ConferenceStore = {
 
 type ConferenceActions = {
   init: (conferenceID:string) => void
+  myUserId: () => ID
   join: () => void
   leave: () => void
   setConferenceName: (name:string) => boolean
@@ -83,13 +84,19 @@ type UserActions = {
 // # IMPLEMENTATIONS *******************************************
 
 export const useConferenceStore = create<ConferenceStore>((set,get) => {
-
+  let localStoreUsername:string;
+  try {
+    const localusername = localStorage.getItem('jitsiUsername')
+    localStoreUsername =  localusername!== null?localusername:'Unfriendly Sphere'
+  } catch (error) {
+    localStoreUsername = 'Unfriendly Sphere'
+  }
   const initialState = {
     conferenceObject:undefined,
     conferenceName: process.env.REACT_APP_DEMO_SESSION || "chatmosphere",
     isJoined:false,
     users:{},
-    displayName:"Friendly Sphere",
+    displayName:localStoreUsername,
     error:undefined,
     messages:[]
   }
@@ -173,8 +180,22 @@ export const useConferenceStore = create<ConferenceStore>((set,get) => {
   const _onConferenceJoined = () => {
     set({isJoined:true})//only Local User -> could be in LocalStore
     const conference = get().conferenceObject
-    conference?.setDisplayName(get().displayName)
+    // console.log(get().displayName)
+    const jitsiname = localStorage.getItem('jitsiUsername');
+    console.log(jitsiname)
+    const url =  window.location.href;
+    if (jitsiname!==null && !/sphere/i.test(jitsiname)){
+      conference?.setDisplayName(jitsiname)
+    }
+    else{
+      console.log('SHOULD CHANGE')
+      
+    }
   } 
+
+  const _onUserNameChanged = (id:string,displayName:string) => {
+    console.log(id,displayName)
+  }
 
   const _onMessageReceived = (id,message,time) => {
     if (time===undefined){
@@ -202,7 +223,7 @@ export const useConferenceStore = create<ConferenceStore>((set,get) => {
       conference.on(JitsiMeetJS.events.conference.TRACK_MUTE_CHANGED, _onTrackMuteChanged);
       conference.on(JitsiMeetJS.events.conference.CONFERENCE_ERROR, _onConferenceError);
       conference.on(JitsiMeetJS.events.conference.MESSAGE_RECEIVED,_onMessageReceived)
-      //conference.on(JitsiMeetJS.events.conference.DISPLAY_NAME_CHANGED, onUserNameChanged);
+      // conference.on(JitsiMeetJS.events.conference.DISPLAY_NAME_CHANGED, _onUserNameChanged);
       // conference.on(JitsiMeetJS.events.conference.TRACK_AUDIO_LEVEL_CHANGED, on_remote_track_audio_level_changed);
       //conference.on(JitsiMeetJS.events.conference.PHONE_NUMBER_CHANGED, onPhoneNumberChanged);
       conference.addCommandListener("pos", _onPositionReceived)
@@ -210,6 +231,7 @@ export const useConferenceStore = create<ConferenceStore>((set,get) => {
       // r.on(JitsiMeetJS.events.conference.PARTICIPANT_PROPERTY_CHANGED, (e) => console.log("Property Changed ", e))
       window.addEventListener('beforeunload', leave) //does this help?  
       window.addEventListener('unload', leave) //does this help?
+      conference.setDisplayName(get().displayName)
       conference.join()
       set({conferenceObject:conference,error:undefined})
     } else {
@@ -220,6 +242,12 @@ export const useConferenceStore = create<ConferenceStore>((set,get) => {
   const join = () => {
 
   }
+
+  const myUserId = () => {
+    const conference = get().conferenceObject
+    return conference!.myUserId()
+  }
+
   const leave = () => { 
     const conference = get().conferenceObject
     conference?.leave()
@@ -239,9 +267,20 @@ export const useConferenceStore = create<ConferenceStore>((set,get) => {
 
 
   const setDisplayName = (name) => {
-    set({displayName:name})
-    const conference = get().conferenceObject
-    conference?.setDisplayName(name)
+    
+    if (!/sphere/i.test(name)){
+      try {
+        localStorage.setItem('jitsiUsername',name)
+      } catch (error) {
+        console.error('cannot save username to local Storage')
+      }
+      set({displayName:name})
+      const conference = get().conferenceObject
+      conference?.setDisplayName(name)
+    }
+    else{
+      // pass
+    } 
   }
   const calculateVolume = (id:ID):void => produceAndSet (newState => {
     const localUserPosition:Point = useLocalStore.getState().pos //check if this is updated or kept by closure
@@ -271,6 +310,7 @@ export const useConferenceStore = create<ConferenceStore>((set,get) => {
     setDisplayName,
     calculateVolume,
     calculateVolumes,
+    myUserId,
     setZoom
   }
 })
