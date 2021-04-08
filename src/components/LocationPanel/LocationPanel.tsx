@@ -14,13 +14,11 @@ const InfoPanelWrapper = styled.div`
 	text-align: initial;
 `
 
-
-
 const InfoPanel = () => {
 	const { pos, user } = useLocalStore()
 	return (
 		<>
-		  <div>{useConferenceStore().displayName || 'me'} ({Math.round(pos.x)}, {Math.round(pos.y)})</div>
+		  <div style={{pointerEvents: "none"}}>{useConferenceStore().displayName || 'me'} ({Math.round(pos.x)}, {Math.round(pos.y)})</div>
 	{ Object.entries(useConferenceStore().users).map(user => {
 		      		return(
 				  <div key={user[0]} style={ (user[1].chatmoClient || user[1].linkMain) ? {} : {color:'#ff0000'} }>{user[1].user?._displayName || user[0]} ({Math.round(user[1].pos.x)}, {Math.round(user[1].pos.y)}) {user[0]}/{user[1].linkMain}</div>
