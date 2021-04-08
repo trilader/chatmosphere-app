@@ -91,4 +91,29 @@ export const GlobalStyles = createGlobalStyle<{theme:ITheme}>`
   .react-transform-element:active{
     cursor:grabbing;
   }
+  #textinput{ 
+    width: 100%;
+    width: -moz-available;          /* For Mozzila */
+    width: -webkit-fill-available;  /* For Chrome */
+    width: stretch;  
+  }
+
+  .block-chat{
+    display:block;
+    left:0px;
+    height:300px;
+    width:300px;
+    // resize:both
+    // maxHeight:350px; 
+    // maxWidth:700px;
+    
+  }
+  .hide-chat{
+    display:none;
+  }
+
+  .last-item{
+
+  }
+
 `

@@ -16,6 +16,8 @@ import { ScreenSharing } from '../../components/Footer/ScreenSharing/ScreenShari
 import { LocalStoreLogic } from '../../store/LocalStoreLogic'
 import { useConferenceStore } from '../../store/ConferenceStore'
 import { useParams, useHistory } from 'react-router-dom'
+import { ChatPanel } from '../../components/ChatMessagePanel/ChatPanel'
+import { useLocalStore } from '../../store/LocalStore'
 const Debug = () => {
 
 	const conferenceStore = useConferenceStore();
@@ -38,10 +40,7 @@ const Debug = () => {
 
 
 export const Session = () => {
-	
-	
-
-	return (
+		return (
 		<React.Fragment>
 			<ErrorHandler />
 			<Info>
@@ -62,7 +61,8 @@ export const Session = () => {
                 <ScreenSharing/>
 				<JoinButton joined={true} />
 				<MuteButton />
-			</Footer>
+			</Footer>	
+						<ChatPanel />
                         <LocationPanel/>
 						<Debug></Debug>
 		</React.Fragment>

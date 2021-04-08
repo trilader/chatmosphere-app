@@ -9,7 +9,7 @@ import { panOptions } from '../PanWrapper/panOptions';
 
 const InfoPanelWrapper = styled.div`
 	position: fixed;
-	top: 0px;
+	bottom: 100px;
 	left: 0px;
 	text-align: initial;
 `
@@ -111,8 +111,7 @@ export const LocationPanel = () => {
 
 	return (
 		    <InfoPanelWrapper>
-				<input type="text" placeholder='Enter Text to Chat' onChange={onInputChange} onKeyDown={onkeydown}  value={localStore.text} />
-	  			<ChatMessagePanel />
+				
 			    <InfoPanel/>
 				<MiniMap/>
 			</InfoPanelWrapper>
@@ -120,43 +119,3 @@ export const LocationPanel = () => {
 }
 
 
-const ChatMessagePanel = () => {
-	const conferenceStore = useConferenceStore();
-
-	const userMap = new Map<string,string>();
-	Object.entries(conferenceStore.users).map(user => {userMap.set(user[0],user[1].user._displayName)})
-	return (
-		<>
-		  <div style={{border:"solid",borderRadius:'5px',backgroundColor:'white', height:'200px', overflow:'auto', maxWidth:'350px'}  } >
-	{ conferenceStore.messages.map(messageObj => {
-		      		return(
-				  <div>{messageObj.time.getHours().toString().padStart(2,'0')}:
-				  {messageObj.time.getMinutes().toString().padStart(2,'0')}:
-				  { messageObj.time.getSeconds().toString().padStart(2,'0')}
-				  {userMap.has(messageObj.user)?userMap.get(messageObj.user):messageObj.user}:
-				  
-				  
-				  {isValidHttpUrl(messageObj.message)?LinkMessage(messageObj.message):messageObj.message}</div>
-			 )
-		   	 })}</div>
-		</>)
-}
-
-
-function isValidHttpUrl(string) {
-	let url;
-	
-	try {
-		url = new URL(string);
-	} catch (_) {
-		return false;  
-	}
-	
-	return url.protocol === "http:" || url.protocol === "https:";
-	}	
-
-  
-
-const LinkMessage = (message: string) => {
-	return (<a target="_blank" href={message}>{message}</a>);
-}
