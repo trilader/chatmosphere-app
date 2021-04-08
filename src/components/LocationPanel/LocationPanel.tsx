@@ -12,9 +12,8 @@ const InfoPanelWrapper = styled.div`
 	bottom: 100px;
 	left: 0px;
 	text-align: initial;
+	pointer-events:none;
 `
-
-
 
 const InfoPanel = () => {
 	const { pos, user } = useLocalStore()
@@ -23,7 +22,7 @@ const InfoPanel = () => {
 		  <div>{useConferenceStore().displayName || 'me'} ({Math.round(pos.x)}, {Math.round(pos.y)})</div>
 	{ Object.entries(useConferenceStore().users).map(user => {
 		      		return(
-				  <div key={user[0]} style={ (user[1].chatmoClient || user[1].linkMain) ? {} : {color:'#ff0000'} }>{user[1].user?._displayName || user[0]} ({Math.round(user[1].pos.x)}, {Math.round(user[1].pos.y)}) {user[0]}/{user[1].linkMain}</div>
+				  <div  key={user[0]} style={(user[1].chatmoClient || user[1].linkMain) ? {} : {color:'#ff0000'} }>{user[1].user?._displayName || user[0]} ({Math.round(user[1].pos.x)}, {Math.round(user[1].pos.y)}) {user[0]}/{user[1].linkMain}</div>
 			 )
 		   	 })}
 		</>)
