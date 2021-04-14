@@ -83,6 +83,18 @@ type UserActions = {
 
 // # IMPLEMENTATIONS *******************************************
 
+const fnv32a = (str: String): number => {
+    var FNV1_32A_INIT = 0x811c9dc5;
+    var hval = FNV1_32A_INIT;
+    for ( var i = 0; i < str.length; ++i )
+    {
+        hval ^= str.charCodeAt(i);
+        hval += (hval << 1) + (hval << 4) + (hval << 7) + (hval << 8) + (hval << 24);
+        hval &= 0xffffffff;
+    }
+    return hval >>> 0;
+}
+
 export const useConferenceStore = create<ConferenceStore>((set,get) => {
   let localStoreUsername:string;
   try {
@@ -110,7 +122,11 @@ export const useConferenceStore = create<ConferenceStore>((set,get) => {
 
   // Private Helper Functions *******************************************
   const _addUser = (id:ID, user?:any) :void => produceAndSet (newState => {
-    newState.users[id] = {id:id, user:user, mute:false, volume:1, pos: panOptions.user.initialPosition, zoom: false, chatmoClient: false }
+
+    let d = (fnv32a("d" + id) / 0xffffffff) * 2*Math.PI;
+    let r = (fnv32a("r" + id) / 0xffffffff) * 200 + 200;
+    let initialPosition = { x: panOptions.room.size.x / 2 - Math.sin(d) * r, y: panOptions.room.size.y / 2 - Math.cos(d) * r };
+    newState.users[id] = {id:id, user:user, mute:false, volume:1, pos: initialPosition, zoom: false, chatmoClient: false }
   })
   const _removeUser = (id:ID) :void => produceAndSet (newState => {
     delete newState.users[id]
