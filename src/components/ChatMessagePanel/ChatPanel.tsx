@@ -18,7 +18,7 @@ z-index:2;
 export const ChatPanel = () => {
 
     const [active,setActive] = React.useState<boolean>(false)
-    const [chatclass,setChatClass] = React.useState<string>("hide-chat")
+    
 	const conferenceStore = useConferenceStore();
 	const localStore = useLocalStore();
 	  const onInputChange = (e) =>{
@@ -33,9 +33,7 @@ export const ChatPanel = () => {
 	}
 
     const toggleChat = (e) => {
-        console.log('AAH')
         setActive(!active)
-        setChatClass(active?"block-chat":"hide-chat")
     }
 
     
@@ -47,7 +45,7 @@ export const ChatPanel = () => {
         onClick={toggleChat}>
                 Toggle Chat
     </button>
-    <div className={chatclass} >
+    <div className={active?"block-chat":"hide-chat"} >
 
     <ChatMessagePanel />
      <input id="textinput"  type="text" placeholder='Enter Text to Chat' onChange={onInputChange} onKeyDown={onKeyDown}  value={localStore.text} />
