@@ -44,12 +44,19 @@ export const ChatPanel = () => {
     <ChatWrapper>
      <button
         onClick={toggleChat}>
-                Toggle Chat ({!active?conferenceStore.unreadMessages.toString():""})
+                Toggle Chat 
     </button>
+    {active? "":<ChatCount></ChatCount> }
     <div className={active?"block-chat":"hide-chat"} >
 
     <ChatMessagePanel />
      <input id="textinput"  type="text" placeholder='Enter Text to Chat' onChange={onInputChange} onKeyDown={onKeyDown}  value={localStore.text} />
      </div>
      </ChatWrapper>)
+}
+
+
+const ChatCount = () => {
+    const conferenceStore = useConferenceStore();
+    return (<>({conferenceStore.unreadMessages.toString()})</>)
 }
