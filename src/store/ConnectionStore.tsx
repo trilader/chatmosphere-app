@@ -50,8 +50,8 @@ type IJsMeet = {
   events: IJitsiEvents
   mediaDevices: IMediaDevices
   createLocalTracks: (
-    options: { devices: deviceType[] , resolution?:number, constraints?:null, cameraDeviceId?:string, micDeviceId?:string},
-    notSure: boolean,
+    options?: { devices?: deviceType[] , resolution?:number, constraints?:any, cameraDeviceId?:string, micDeviceId?:string},
+    notSure?: boolean,
   ) => Promise<Track[]>
   JitsiConnection: any
 }

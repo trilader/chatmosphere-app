@@ -44,6 +44,8 @@ export const useLocalStore = create<Store>((set,get) => {
   // # Private Functions
   const _produceAndSet = (callback:(newState:Store)=>void)=>set(state => produce(state, newState => callback(newState)))
 
+
+
   
   // # Public Functions
   const setLocalPosition = (newPosition) => {
@@ -69,8 +71,11 @@ export const useLocalStore = create<Store>((set,get) => {
   const setLocalTracks = tracks => _produceAndSet(newState=>{
     const audioTrack = tracks.find(t=>t.getType() === 'audio')
     const videoTrack = tracks.find(t=>t.getType() === 'video')
-    newState.video = videoTrack
-    newState.audio = audioTrack
+    // console.log(videoTrack)
+    // console.log(audioTrack)
+    videoTrack!==undefined?newState.video = videoTrack:newState.video=newState.video
+    audioTrack!==undefined?newState.audio = audioTrack:newState.video=newState.audio
+      
   })
 
   const clearLocalTracks = () => _produceAndSet(newState=>{
@@ -80,7 +85,11 @@ export const useLocalStore = create<Store>((set,get) => {
     newState.video=undefined
   })
 
-  const setMyID = (id:string) => set({id:id})
+  const setMyID = (id:string) => {
+   
+    set({id:id})
+    
+  }
 
   const onPanChange = ({scale,positionX, positionY}) => {
     const viewport = {
