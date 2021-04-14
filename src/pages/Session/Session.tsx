@@ -18,6 +18,7 @@ import { useConferenceStore } from '../../store/ConferenceStore'
 import { useParams, useHistory } from 'react-router-dom'
 import { ChatPanel } from '../../components/ChatMessagePanel/ChatPanel'
 import { useLocalStore } from '../../store/LocalStore'
+import { SelectMediaDevicesButtons } from '../../components/Footer/SelectMediaDevicesButtons/SelectMediaDevicesButtons'
 const Debug = () => {
 
 	const conferenceStore = useConferenceStore();
@@ -61,6 +62,7 @@ export const Session = () => {
                 <ScreenSharing/>
 				<JoinButton joined={true} />
 				<MuteButton />
+				<SelectMediaDevicesButtons/>
 			</Footer>	
 						<ChatPanel />
                         <LocationPanel/>

@@ -22,6 +22,7 @@ type IJitsiEvents = {
     TRACK_MUTE_CHANGED
     CONFERENCE_ERROR
     MESSAGE_RECEIVED
+    DISPLAY_NAME_CHANGED
   }
   connection: {
     CONNECTION_ESTABLISHED
@@ -34,15 +35,22 @@ type deviceType = "audio" | "video" | "desktop"
 
 type IMediaDevices = {
   isDevicePermissionGranted: (type?: deviceType) => Promise<boolean>
+  enumerateDevices: (callback) => void;
+  isDeviceChangeAvailable: (deviceType:deviceType) => boolean
+  isDeviceListAvailable: () => boolean
+  
+  setAudioOutputDevice: (deviceId:string) => void
+  getAudioOutputDevice: () => string
 }
 
 type IJsMeet = {
   init: (options: IJitsiInitOptions) => void
   addTrack: (track: Track) => void
+  getActiveAudioDevice: () => Promise<{deviceId:string|number,deviceLabel:string}>
   events: IJitsiEvents
   mediaDevices: IMediaDevices
   createLocalTracks: (
-    options: { devices: deviceType[] },
+    options: { devices: deviceType[] , resolution?:number, constraints?:null, cameraDeviceId?:string, micDeviceId?:string},
     notSure: boolean,
   ) => Promise<Track[]>
   JitsiConnection: any
@@ -88,6 +96,8 @@ export const useConnectionStore = create<IStore>((set, get) => {
   // # Public Functions
   const initJitsiMeet = async () => {
     const jsMeet = get().jsMeet
+    console.log('test')
+    
     if (jsMeet) return jsMeet
     // not sure if most elegant but now returns jitsi object and we can initialize conference nicely after server
     jitsiMeetPromise = new Promise((res, rej) => {
