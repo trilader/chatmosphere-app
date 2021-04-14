@@ -16,7 +16,7 @@ export const ChatMessagePanel = () => {
         ,[conferenceStore.messages]);
 	return (
 		<>
-		  <div style={{backgroundColor:'rgba(10,10,10,0.2)', height:'90%', overflow:'auto', maxWidth:'inherit', textAlign:"left",resize:"both"}  } >
+		  <div style={{backgroundColor:'rgba(23,116,203,0.2)', height:'90%', overflow:'auto', maxWidth:'inherit', textAlign:"left",resize:"both"}  } >
 	        { conferenceStore.messages.map((messageObj,i,list) => {
                     if(i === list.length-1){
                        

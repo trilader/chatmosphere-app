@@ -95,17 +95,23 @@ export const GlobalStyles = createGlobalStyle<{theme:ITheme}>`
     width: 100%;
     width: -moz-available;          /* For Mozzila */
     width: -webkit-fill-available;  /* For Chrome */
-    width: stretch;  
+    width: stretch;
+    background-color:rgba(23,116,203,0.2);
+    border:none;
+    border-radius:10px;
+    margin-top:10px;
+    height:clamp(3%,50px,10%);
+    position:relative;
+    display: inline-block;
   }
 
   .block-chat{
+    border-radius:10px;
     display:block;
     left:0px;
     height:300px;
-    width:300px;
-    // resize:both
-    // maxHeight:350px; 
-    // maxWidth:700px;
+    width:max-content;
+    backround-color:rgba(23,116,203,0.2);
     
   }
   .hide-chat{

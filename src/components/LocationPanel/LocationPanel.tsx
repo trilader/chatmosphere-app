@@ -9,9 +9,9 @@ import { panOptions } from '../PanWrapper/panOptions';
 
 const InfoPanelWrapper = styled.div`
 	position: fixed;
-	bottom: 100px;
-	left: 0px;
-	text-align: initial;
+	top: 80px;
+	right: 0px;
+	text-align: end;
 	pointer-events:none;
 `
 
@@ -111,8 +111,8 @@ export const LocationPanel = () => {
 	return (
 		    <InfoPanelWrapper>
 				
-			    <InfoPanel/>
 				<MiniMap/>
+			    <InfoPanel/>
 			</InfoPanelWrapper>
                )
 }
