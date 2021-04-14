@@ -17,9 +17,9 @@ z-index:2;
 
 export const ChatPanel = () => {
 
-    const [active,setActive] = React.useState<boolean>(false)
-    
 	const conferenceStore = useConferenceStore();
+    const [active,setActive] = React.useState<boolean>(false)
+    const [unreadMessages,clearMessage] = React.useState<number>(0); 
 	const localStore = useLocalStore();
 	  const onInputChange = (e) =>{
 		localStore.setLocalText(e.target.value)
@@ -34,6 +34,7 @@ export const ChatPanel = () => {
 
     const toggleChat = (e) => {
         setActive(!active)
+        conferenceStore.clearUnreadMessages()
     }
 
     
@@ -43,7 +44,7 @@ export const ChatPanel = () => {
     <ChatWrapper>
      <button
         onClick={toggleChat}>
-                Toggle Chat
+                Toggle Chat ({!active?conferenceStore.unreadMessages.toString():""})
     </button>
     <div className={active?"block-chat":"hide-chat"} >
 

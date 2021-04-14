@@ -63,6 +63,7 @@ type ConferenceStore = {
   displayName:string
   error:any
   messages:Array<{user:string,message:string,time:Date}>
+  unreadMessages:number
 } & ConferenceActions & UserActions
 
 type ConferenceActions = {
@@ -73,6 +74,7 @@ type ConferenceActions = {
   setConferenceName: (name:string) => boolean
   setZoom: (id:ID, val:boolean) => void
   sendTextMessage:(text:string)=> void
+  clearUnreadMessages:()=> void
 }
 
 type UserActions = {
@@ -110,15 +112,24 @@ export const useConferenceStore = create<ConferenceStore>((set,get) => {
     users:{},
     displayName:localStoreUsername,
     error:undefined,
-    messages:[]
+    messages:[],
+    unreadMessages:0
   }
 
   const produceAndSet = (callback:(newState:ConferenceStore)=>void)=>set(state => produce(state, newState => callback(newState)))
 
 
   const _addMessage = (id:string, message:string, date:Date): void => produceAndSet ( newState => {
-    newState.messages.push({user:id,message:message,time:date})
+    newState.messages.push({user:id,message:message,time:date});
+    newState.unreadMessages = newState.unreadMessages +1;
   })
+
+
+  const clearUnreadMessages = ():void => produceAndSet( newState => {
+    newState.unreadMessages = 0;
+  })
+
+
 
   // Private Helper Functions *******************************************
   const _addUser = (id:ID, user?:any) :void => produceAndSet (newState => {
@@ -327,7 +338,8 @@ export const useConferenceStore = create<ConferenceStore>((set,get) => {
     calculateVolume,
     calculateVolumes,
     myUserId,
-    setZoom
+    setZoom,
+    clearUnreadMessages
   }
 })
 
