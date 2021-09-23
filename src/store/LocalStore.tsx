@@ -1,9 +1,8 @@
-import produce from "immer";
-import create from "zustand";
-import { Track, User } from "./ConferenceStore";
-import { panOptions, transformWrapperOptions } from "../components/PanWrapper/panOptions";
-import { mountStoreDevtool } from "simple-zustand-devtools";
-import { connectionOptions } from "../serverConfig-example";
+import produce from "immer"
+import create from "zustand"
+import { Track, User } from "./ConferenceStore"
+import { panOptions, transformWrapperOptions } from "../components/PanWrapper/panOptions"
+import { mountStoreDevtool } from "simple-zustand-devtools"
 
 
 export type Point = {x:number, y:number}
@@ -15,14 +14,26 @@ type ZoomPan = {
   onPanChange: (params:any) => void
 } 
 
+type Settings = {
+  error?: any
+  selectedAudioInputDevice?: string
+  selectedAudioOutputDevice?: string
+  selectedCameraDevice?: string
+}
+
 type Store = {
   setLocalText: (newText:string) => void
   setLocalPosition: (newPosition:Point) => void
   setLocalTracks: (tracks:Track[]) => void
+  setMicAndCamera: (micTrack: Track | undefined, camTrack: Track | undefined) => void
   toggleMute: () => void
+  selectSettings: (obj: Settings | undefined) => void
   clearLocalTracks: () => void
+  setAvailableDevices: (deviceInfos: MediaDeviceInfo[]) => void
   setMyID: (id:string) => void
-  text:string
+  text: string
+  settings: Settings | undefined
+  availableDevices: MediaDeviceInfo[]
 } & User & ZoomPan
 
 export const useLocalStore = create<Store>((set,get) => {
@@ -30,6 +41,8 @@ export const useLocalStore = create<Store>((set,get) => {
   const state = {
     id:"",
     mute:false,
+    settings: undefined,
+    availableDevices: [],
     volume:1,
     video:undefined,
     audio:undefined,
@@ -66,11 +79,20 @@ export const useLocalStore = create<Store>((set,get) => {
     }
   }
 
-  const setLocalTracks = tracks => _produceAndSet(newState=>{
-    const audioTrack = tracks.find(t=>t.getType() === 'audio')
-    const videoTrack = tracks.find(t=>t.getType() === 'video')
+  const selectSettings = (obj: Settings | undefined) => {
+    set({ settings: obj });
+  }
+
+  const setLocalTracks = (tracks) => _produceAndSet(newState => {
+    const audioTrack = tracks.find(t => t.getType() === "audio")
+    const videoTrack = tracks.find(t => t.getType() === "video")
     newState.video = videoTrack
     newState.audio = audioTrack
+  })
+
+  const setMicAndCamera = (micTrack: Track | undefined, camTrack: Track | undefined) => _produceAndSet(newState => {
+    newState.video = camTrack
+    newState.audio = micTrack
   })
 
   const clearLocalTracks = () => _produceAndSet(newState=>{
@@ -79,6 +101,10 @@ export const useLocalStore = create<Store>((set,get) => {
     newState.audio=undefined
     newState.video=undefined
   })
+
+  const setAvailableDevices = (deviceInfos: MediaDeviceInfo[]) => {
+    set({ availableDevices: deviceInfos });
+  }
 
   const setMyID = (id:string) => set({id:id})
 
@@ -102,8 +128,11 @@ export const useLocalStore = create<Store>((set,get) => {
   ...state,
   setLocalPosition,
   setLocalTracks,
+  setMicAndCamera,
   toggleMute,
+  selectSettings,
   clearLocalTracks,
+  setAvailableDevices,
   setMyID,
   onPanChange,
   setLocalText
