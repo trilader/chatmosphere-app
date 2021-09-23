@@ -36,8 +36,8 @@ export const LocalStoreLogic = () => {
   
   useEffect(() => {
       jsMeet
-        ?.createLocalTracks({ devices: [ 'audio', 'video' ] }, true)
-        .then(tracks => {setLocalTracks(tracks)})
+        ?.createLocalTracks({ devices: [ 'audio', 'video' ] })
+        .then(tracks => { setLocalTracks(tracks) })
         .catch(error => {
           console.log(error)
         });
