@@ -34,6 +34,15 @@ type deviceType = "audio" | "video" | "desktop"
 
 type IMediaDevices = {
   isDevicePermissionGranted: (type?: deviceType) => Promise<boolean>
+  enumerateDevices: (callback: (deviceInfos: MediaDeviceInfo[]) => void) => void
+  setAudioOutputDevice: (deviceId: string) => void
+  getAudioOutputDevice: () => string
+}
+
+type LocalTrackOptions = {
+  devices: deviceType[]
+  cameraDeviceId?: string
+  micDeviceId?: string
 }
 
 type IJsMeet = {
@@ -41,9 +50,8 @@ type IJsMeet = {
   addTrack: (track: Track) => void
   events: IJitsiEvents
   mediaDevices: IMediaDevices
-  createLocalTracks: (
-    options: { devices: deviceType[] },
-    notSure: boolean,
+  createLocalTracks: ( // see https://jitsi.github.io/handbook/docs/dev-guide/dev-guide-ljm-api#jitsimeetjs
+    options?: LocalTrackOptions,
   ) => Promise<Track[]>
   JitsiConnection: any
 }

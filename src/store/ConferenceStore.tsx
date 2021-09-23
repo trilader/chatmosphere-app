@@ -16,7 +16,8 @@ declare global {
 }
 
 export type Track = {
-  track:{id:string}
+  track: {id: string, label: string}
+  deviceId: string
   containers:any[]
   getType: () => 'video'|'audio'|'desktop'
   dispose: () => Promise<void>
@@ -48,7 +49,9 @@ export type IJitsiConference={
   join:()=>void
   sendTextMessage:(text:string)=> void
   setDisplayName:(name:string)=>void
-  addTrack:(track:Track)=>Promise<any>
+  addTrack: (track: Track) => Promise<any>
+  removeTrack: (track: Track) => Promise<void>
+  replaceTrack: (oldTrack: Track, newTrack: Track) => Promise<void>
   myUserId:()=>ID
 
   leave:()=>void
