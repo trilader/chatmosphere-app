@@ -17,7 +17,8 @@ import { LocalStoreLogic } from '../../store/LocalStoreLogic'
 import { useConferenceStore } from '../../store/ConferenceStore'
 import { useParams, useHistory } from 'react-router-dom'
 import { ChatPanel } from '../../components/ChatMessagePanel/ChatPanel'
-import { useLocalStore } from '../../store/LocalStore'
+import { SettingsButton } from "../../components/Footer/SettingsButton/SettingsButton"
+
 const Debug = () => {
 
 	const conferenceStore = useConferenceStore();
@@ -58,13 +59,14 @@ export const Session = () => {
 				</Room>
 			</PanWrapper>
 			<Footer>
-                <ScreenSharing/>
+				<ScreenSharing />
 				<JoinButton joined={true} />
 				<MuteButton />
-			</Footer>	
-						<ChatPanel />
-                        <LocationPanel/>
-						<Debug></Debug>
+				<SettingsButton />
+			</Footer>
+			<ChatPanel />
+			<LocationPanel/>
+			<Debug></Debug>
 		</React.Fragment>
 	)
 }
