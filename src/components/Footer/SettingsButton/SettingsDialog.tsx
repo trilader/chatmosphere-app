@@ -1,10 +1,11 @@
 import * as React from "react"
 import styled, { css } from "styled-components"
 import { useLocalStore } from "../../../store/LocalStore"
-import { useConnectionStore } from "../../../store/ConnectionStore"
+import { checkLocalStorageBool, useConnectionStore } from "../../../store/ConnectionStore"
 import { Button } from "../../common/Buttons/Button"
 import produce from "immer"
-import { Track, useConferenceStore } from "../../../store/ConferenceStore"
+import { useConferenceStore } from "../../../store/ConferenceStore"
+import { jitsiInitOptions } from "../../JitsiConnection/jitsiOptions"
 
 const StyleBox = styled.div`
   user-select: none;
@@ -92,8 +93,38 @@ export const SettingsDialog = () => {
 	const selectSettings = useLocalStore(store => store.selectSettings)
 	const audioTrack = useLocalStore(store => store.audio)
 	const videoTrack = useLocalStore(store => store.video)
+	const houstonWeNeedAReload = useLocalStore(store => store.houstonWeNeedAReload)
+	const needsReload = useLocalStore(store => store.needsReload)
+
+	function showReloadMessage() {
+		if (settings) {
+			houstonWeNeedAReload();
+		}
+	}
 
 	function saveSettings() {
+		if (settings) {
+			if (settings.audioProcessingEnabled !== undefined) {
+				localStorage.setItem("jitsiAudioProcessingEnabled", settings.audioProcessingEnabled ? "true" : "false");
+				showReloadMessage();
+			}
+			if (settings.echoCancellationEnabled !== undefined) {
+				localStorage.setItem("jitsiEchoCancellationEnabled", settings.echoCancellationEnabled ? "true" : "false");
+				showReloadMessage();
+			}
+			if (settings.noiseSuppressionEnabled !== undefined) {
+				localStorage.setItem("jitsiNoiseSuppressionEnabled", settings.noiseSuppressionEnabled ? "true" : "false");
+				showReloadMessage();
+			}
+			if (settings.autoGainEnabled !== undefined) {
+				localStorage.setItem("jitsiAutoGainEnabled", settings.autoGainEnabled ? "true" : "false");
+				showReloadMessage();
+			}
+			if (settings.stereoEnabled !== undefined) {
+				localStorage.setItem("jitsiStereoEnabled", settings.stereoEnabled ? "true" : "false");
+				showReloadMessage();
+			}
+		}
 		if (jsMeet && settings) {
 			if (settings.selectedAudioOutputDevice) {
 				jsMeet.mediaDevices.setAudioOutputDevice(settings.selectedAudioOutputDevice);
@@ -165,6 +196,33 @@ export const SettingsDialog = () => {
 	// 	}
 	// }
 
+	function onAutoGainChanged(event) {
+		if (settings) {
+			selectSettings(produce(settings, newSettings => {
+				newSettings.unchanged = false;
+				newSettings.autoGainEnabled = event.target.checked;
+			}));
+		}
+	}
+
+	function onNoiseSuppressionChanged(event) {
+		if (settings) {
+			selectSettings(produce(settings, newSettings => {
+				newSettings.unchanged = false;
+				newSettings.noiseSuppressionEnabled = event.target.checked;
+			}));
+		}
+	}
+
+	function onEchoCancellationChanged(event) {
+		if (settings) {
+			selectSettings(produce(settings, newSettings => {
+				newSettings.unchanged = false;
+				newSettings.echoCancellationEnabled = event.target.checked;
+			}));
+		}
+	}
+
 	if (!settings) {
 		return null
 	} else if (settings.error) {
@@ -208,6 +266,36 @@ export const SettingsDialog = () => {
 		// 																					deviceFilter="audiooutput"
 		// 																					onChange={onAudioOutputChanged} />
 		// }
+		let audioProcessingChecked = checkLocalStorageBool("jitsiAudioProcessingEnabled")
+		if (settings.audioProcessingEnabled !== undefined) {
+			audioProcessingChecked = settings.audioProcessingEnabled;
+		} else if (audioProcessingChecked === null) {
+			audioProcessingChecked = !jitsiInitOptions.disableAP;
+		}
+		let echoCancellationChecked = checkLocalStorageBool("jitsiEchoCancellationEnabled");
+		if (settings.echoCancellationEnabled !== undefined) {
+			echoCancellationChecked = settings.echoCancellationEnabled;
+		} else if (echoCancellationChecked === null) {
+			echoCancellationChecked = !jitsiInitOptions.disableAEC;
+		}
+		let noiseSuppressionChecked = checkLocalStorageBool("jitsiNoiseSuppressionEnabled");
+		if (settings.noiseSuppressionEnabled !== undefined) {
+			noiseSuppressionChecked = settings.noiseSuppressionEnabled;
+		} else if (noiseSuppressionChecked === null) {
+			noiseSuppressionChecked = !jitsiInitOptions.disableNS;
+		}
+		let autoGainChecked = checkLocalStorageBool("jitsiAutoGainEnabled");
+		if (settings.autoGainEnabled !== undefined) {
+			autoGainChecked = settings.autoGainEnabled;
+		} else if (autoGainChecked === null) {
+			autoGainChecked = !jitsiInitOptions.disableAGC;
+		}
+		let stereoChecked = checkLocalStorageBool("jitsiStereoEnabled");
+		if (settings.stereoEnabled !== undefined) {
+			stereoChecked = settings.stereoEnabled;
+		} else if (stereoChecked === null) {
+			stereoChecked = jitsiInitOptions.audioQuality?.stereo === true;
+		}
 		return (
 			<StyleBox>
 				<div>
@@ -223,7 +311,23 @@ export const SettingsDialog = () => {
 				{/*	Current audio output device: <span>{JSON.stringify(jsMeet?.mediaDevices.getAudioOutputDevice())}</span>*/}
 				{/*	{audioOutputDeviceSelect}*/}
 				{/*</div>*/}
-				<div style={{ paddingTop: '1em' }}>
+				<div>
+					<input id="autogainCheckbox" type="checkbox" onChange={onAutoGainChanged} checked={autoGainChecked} />
+					<label htmlFor="autogainCheckbox">Auto gain?</label>
+					<br />
+					<input id="noiseCheckbox" type="checkbox" onChange={onNoiseSuppressionChanged} checked={noiseSuppressionChecked} />
+					<label htmlFor="noiseCheckbox">Noise suppression?</label>
+					<br />
+					<input id="echocancelCheckbox" type="checkbox" onChange={onEchoCancellationChanged} checked={echoCancellationChecked} />
+					<label htmlFor="echocancelCheckbox">Echo cancellation?</label>
+					<br />
+					{
+						needsReload
+							? <span style={{ display: "inline-block", fontWeight: "bold", color: "#a41a1a", paddingTop: ".5em" }}>Please reload to apply the settings</span>
+							: <></>
+					}
+				</div>
+				<div style={{ paddingTop: "1em" }}>
 					<Button style={{ display: "inline-block" }} onClick={saveSettings}>{settings?.unchanged ? "Maybe fix a video?" : "Save"}</Button>
 				</div>
 			</StyleBox>

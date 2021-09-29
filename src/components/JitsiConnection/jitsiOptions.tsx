@@ -12,6 +12,15 @@ export interface IJitsiInitOptions {
   preferredCodec?: string
   disabledCodec?: string
   preferH264?: boolean //deprecated
+
+  // see RTCUtils.js in jitsi-meet-js
+  disableAP?: boolean, // all audio processing
+  disableAEC?: boolean,  // echo cancellation
+  disableNS?: boolean, // noise suppression
+  disableAGC?: boolean, // auto gain control
+  audioQuality?: {
+    stereo?: boolean,
+  },
 }
 
 // -------------------------
@@ -22,13 +31,20 @@ export const conferenceOptions = {
   openBridgeChannel: false, //what is this doing?
 }
 
-export const jitsiInitOptions:IJitsiInitOptions = {
+export const jitsiInitOptions: IJitsiInitOptions = {
   disableAudioLevels: false,
-  preferredCodec: 'H264',
-  disabledCodec: 'VP8',
+  preferredCodec: "H264",
+  disabledCodec: "VP8",
   disableSimulcast: false,
   preferH264: true,
-  // // useIPv6:true, // can be off
+  disableAP: false,
+  disableAEC: false,
+  disableNS: false,
+  disableAGC: false,
+  audioQuality: {
+    stereo: false,
+  },
+  // useIPv6:true, // can be off
   // enableWindowOnErrorHandler: false,
   // disableThirdPartyRequests: false,
   // enableAnalyticsLogging: true
