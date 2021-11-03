@@ -15,6 +15,7 @@ type ZoomPan = {
 } 
 
 type Settings = {
+  unchanged?: boolean
   error?: any
   selectedAudioInputDevice?: string
   selectedAudioOutputDevice?: string

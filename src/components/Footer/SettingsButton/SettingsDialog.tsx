@@ -141,6 +141,7 @@ export const SettingsDialog = () => {
 	function onCameraChanged(event) {
 		if (settings) {
 			selectSettings(produce(settings, newSettings => {
+				newSettings.unchanged = false;
 				newSettings.selectedCameraDevice = event.target.value;
 			}));
 		}
@@ -149,6 +150,7 @@ export const SettingsDialog = () => {
 	function onAudioInputChanged(event) {
 		if (settings) {
 			selectSettings(produce(settings, newSettings => {
+				newSettings.unchanged = false;
 				newSettings.selectedAudioInputDevice = event.target.value;
 			}));
 		}
@@ -157,6 +159,7 @@ export const SettingsDialog = () => {
 	// function onAudioOutputChanged(event) {
 	// 	if (settings) {
 	// 		selectSettings(produce(settings, newSettings => {
+	// 			newSettings.unchanged = false;
 	// 			newSettings.selectedAudioOutputDevice = event.target.value;
 	// 		}));
 	// 	}
@@ -221,7 +224,7 @@ export const SettingsDialog = () => {
 				{/*	{audioOutputDeviceSelect}*/}
 				{/*</div>*/}
 				<div style={{ paddingTop: '1em' }}>
-					<Button style={{ display: "inline-block" }} onClick={saveSettings}>Save</Button>
+					<Button style={{ display: "inline-block" }} onClick={saveSettings}>{settings?.unchanged ? "Maybe fix a video?" : "Save"}</Button>
 				</div>
 			</StyleBox>
 		)

@@ -20,6 +20,7 @@ export const SettingsButton = () => {
 			} else {
 				jsMeet.mediaDevices.enumerateDevices(setAvailableDevices);
 				selectSettings({
+					unchanged: true,
 					selectedAudioInputDevice: audioTrack?.deviceId,
 					selectedCameraDevice: videoTrack?.deviceId
 				})
