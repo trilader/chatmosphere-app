@@ -30,9 +30,10 @@ export type Track = {
   detach: (element:HTMLElement) => void
 }
 export type AudioTrack = Track
-export type VideoTrack = Track 
+export type VideoTrack = Track
+export type DesktopTrack = Track 
 
-export type User = { id:ID, user?:any, mute:boolean, volume:number, pos:Point, audio?:AudioTrack, video?:VideoTrack }
+export type User = { id:ID, user?:any, mute:boolean, volume:number, pos:Point, audio?:AudioTrack, video?:VideoTrack, desktop?:DesktopTrack }
 type Users = { [id:string]:User }
 type Point = {x:number, y:number}
 type ID = string
@@ -105,6 +106,12 @@ export const useConferenceStore = create<ConferenceStore>((set,get) => {
   const _addVideoTrack = (id:ID, track:Track):void => produceAndSet (newState => {
     if(newState.users[id]) newState.users[id].video = track
   })
+  const _addDesktopTrack = (id:ID, track:Track):void => produceAndSet (newState => {
+    if(newState.users[id]) newState.users[id].desktop = track
+  })
+  const _removeDesktopTrack = (id:ID):void => produceAndSet (newState => {
+    if(newState.users[id]) newState.users[id].desktop = undefined
+  })
   const _removeVideoTrack = (id:ID):void => produceAndSet (newState => {
     if(newState.users[id]) newState.users[id].video = undefined
   })
@@ -157,7 +164,6 @@ export const useConferenceStore = create<ConferenceStore>((set,get) => {
     const enteredConferenceName = conferenceID.length > 0 ? conferenceID.toLowerCase() : get().conferenceName?.toLowerCase()
     const conferenceName = process.env.REACT_APP_DEMO_SESSION || enteredConferenceName
     set({conferenceName:conferenceName})
-    // console.log("init:",connection ,JitsiMeetJS , conferenceName,useConnectionStore.getState().connected,conferenceID)
     if(connection && JitsiMeetJS && conferenceName) {
       const conference = connection.initJitsiConference(conferenceName, conferenceOptions) //TODO before unload close connection
       conference.on(JitsiMeetJS.events.conference.USER_JOINED, _addUser)

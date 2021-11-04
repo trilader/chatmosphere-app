@@ -5,6 +5,7 @@ import { AudioTrack } from './AudioTrack';
 import { MuteIndicator } from './MuteIndicator';
 import { VideoTrack } from './VideoTrack';
 import { NameTag } from '../NameTag/NameTag';
+import { ScreenshareIndicator } from '../ScreenShare/Indicator';
 
 
 export const User = ({id, user}) => {
@@ -25,6 +26,7 @@ export const User = ({id, user}) => {
       <NameTag>{user?.user?._displayName || 'Friendly Sphere'}</NameTag>
       <div>Volume {Math.round(myVolume * 11)}</div>
       {isMute && <MuteIndicator>🤭</MuteIndicator>}
+      <ScreenshareIndicator />
     </div>
   )
 }
