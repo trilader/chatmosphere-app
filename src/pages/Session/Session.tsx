@@ -4,6 +4,7 @@ import { Info } from '../../components/common/Info/Info'
 import { Footer } from '../../components/Footer/Footer'
 import { JoinButton } from '../../components/Footer/JoinButton/JoinButton'
 import { MuteButton } from '../../components/Footer/MuteButton/MuteButton'
+import { ScreenshareButton } from '../../components/Footer/ScreenshareButton/ScreenshareButton'
 import { Header } from '../../components/Header/Header'
 import JitsiConnection from '../../components/JitsiConnection/JitsiConnection'
 import { Localuser } from '../../components/Localuser/Localuser'
@@ -36,6 +37,7 @@ export const Session = () => {
 			<Footer>
 				<JoinButton joined={true} />
 				<MuteButton />
+				<ScreenshareButton />
 			</Footer>
 		</React.Fragment>
 	)

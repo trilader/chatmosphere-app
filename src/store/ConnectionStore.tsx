@@ -29,7 +29,7 @@ type IJitsiEvents = {
   }
 }
 
-type deviceType = "audio" | "video"
+type deviceType = "audio" | "video" | "desktop"
 
 type IMediaDevices = {
   isDevicePermissionGranted: (type?: deviceType) => Promise<boolean>

@@ -17,7 +17,7 @@ declare global {
 export type Track = {
   track:{id:string}
   containers:any[]
-  getType: () => 'video'|'audio'
+  getType: () => 'video'|'audio'|'desktop'
   dispose: () => void
   isLocal: () => boolean
   isMuted: () => boolean
