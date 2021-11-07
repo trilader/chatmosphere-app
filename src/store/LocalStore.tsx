@@ -19,6 +19,9 @@ type Store = {
   setLocalTracks: (tracks:Track[]) => void
   toggleMute: () => void
   clearLocalTracks: () => void
+  clearVideoTrack: () => void
+  clearAudioTrack: () => void
+  clearScreenTrack: () => void
   setMyID: (id:string) => void
 } & User & ZoomPan
 
@@ -30,6 +33,7 @@ export const useLocalStore = create<Store>((set,get) => {
     volume:1,
     video:undefined,
     audio:undefined,
+    desktop:undefined,
     pos:panOptions.user.initialPosition,
     pan: {x:transformWrapperOptions.defaultPositionX || 0,y: transformWrapperOptions.defaultPositionY || 0},
     scale:1,
@@ -59,11 +63,13 @@ export const useLocalStore = create<Store>((set,get) => {
   const setLocalTracks = tracks => _produceAndSet(newState=>{
     const audioTrack = tracks.find(t=>t.getType() === 'audio')
     const videoTrack = tracks.find(t=>t.videoType==='camera')
+    const desktopTrack = tracks.find(t=>t.videoType==='desktop')
 
     // console.log("track object ", tracks.find(t=>t.videoType==='desktop'))
     console.log("track object ", tracks)
     newState.video = videoTrack
     newState.audio = audioTrack
+    newState.desktop = desktopTrack
   })
 
   const clearLocalTracks = () => _produceAndSet(newState=>{
@@ -72,6 +78,22 @@ export const useLocalStore = create<Store>((set,get) => {
     newState.audio=undefined
     newState.video=undefined
   })
+
+  const clearAudioTrack = () => {
+    const audioTrack = get().audio
+    audioTrack?.dispose()
+    _produceAndSet(n=>{n.audio = undefined})
+  }
+  const clearVideoTrack = () => {
+    const videoTrack = get().video
+    videoTrack?.dispose()
+    _produceAndSet(n=>{n.video = undefined})
+  }
+  const clearScreenTrack = () => {
+    const screenTrack = get().desktop
+    screenTrack?.dispose()
+    _produceAndSet(n=>{n.desktop = undefined})
+  }
 
   const setMyID = (id:string) => set({id:id})
 
@@ -97,6 +119,9 @@ export const useLocalStore = create<Store>((set,get) => {
   setLocalTracks,
   toggleMute,
   clearLocalTracks,
+  clearAudioTrack,
+  clearVideoTrack,
+  clearScreenTrack,
   setMyID,
   onPanChange
 }

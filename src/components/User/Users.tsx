@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Screen } from '../../pages/ScreenShare/Screen';
 import { useConferenceStore } from './../../store/ConferenceStore';
 import { User } from "./User"
 
@@ -9,9 +10,12 @@ export const Users = () => {
   return (
     <>
     {Object.entries(users).map(user => {
-      return(
-          <User key={user[0]} user={user[1]} id={user[0]}/>
-      )
+      //@ts-ignore
+      if(user[1].video?.videoType === "desktop"){
+        return <Screen id={user[0]}/>
+      } else {
+        return <User key={user[0]} user={user[1]} id={user[0]}/>
+      }
     })}
     </>
   )
