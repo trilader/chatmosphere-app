@@ -31,7 +31,7 @@ function App() {
             <Session />
           </Route>
 
-          <Route path="/screenshare/:session/:user">
+          <Route path="/screenshare/:session/:linkPrimary">
             <ScreenShare />
           </Route>
 

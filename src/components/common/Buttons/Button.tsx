@@ -6,13 +6,13 @@ interface IButton {
   danger?: boolean
 }
 
-export const Button = styled.button<IButton>`
+const buttonStyles = `
   font-size: 1rem;
   display: flex;
-	flex-direction: row;
-	align-items: center;
+  flex-direction: row;
+  align-items: center;
   justify-content: center;
-	height: 50px;
+  height: 50px;
   width: 165px;
   border-radius: 5px;
   color: ${props => props.theme.primary['1']};
@@ -51,7 +51,7 @@ export const Button = styled.button<IButton>`
       border: 1px solid ${props => props.theme.secondary['2']};
       background-color: ${props => props.theme.secondary['2']};
     `}
-  
+
   }
   &:active {
       background-color: ${props => props.theme.primary['4']};
@@ -64,9 +64,16 @@ export const Button = styled.button<IButton>`
       background-color: ${props => props.theme.secondary['1']};
     `}
   }
-  
+
   &:focus {
     outline: none;
   }
 `
 
+export const Button = styled.button<IButton>`
+  ${buttonStyles}
+`
+
+export const LinkButton = styled.a<IButton>`
+  ${buttonStyles}
+`

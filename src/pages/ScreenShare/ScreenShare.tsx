@@ -7,7 +7,7 @@ import { useConnectionStore } from './../../store/ConnectionStore'
 import { useConferenceStore } from './../../store/ConferenceStore';
 import { useParams } from 'react-router-dom'
 import { useLocalStore } from '../../store/LocalStore'
-import { ScreenShareVideo } from './Video';
+import { ScreenShareVideo } from './ScreenShareVideo';
 
 
 
@@ -39,17 +39,19 @@ const useScreenShareStore = create<IScreenShareStore>((set, get) => {
 });
 
 
-export const ScreenShare = () => {
-  const conference = useConferenceStore(state => state.conferenceObject)
-  const setLocalTracks = useLocalStore(store => store.setLocalTracks)
-  const initJitsiMeet = useConnectionStore(store => store.initJitsiMeet)
+export const ScreenShare = () => {  
   const jsMeet = useConnectionStore(store => store.jsMeet)
+  const conference = useConferenceStore(state => state.conferenceObject)
+  const users = useConferenceStore(state => state.users)
+  const isJoined = useConferenceStore(state => state.isJoined)
+  const isConnected = useConnectionStore(store => store.connected)
+  const initJitsiMeet = useConnectionStore(store => store.initJitsiMeet)
   const connectServer = useConnectionStore(store => store.connectServer)
-  const connected = useConnectionStore(store => store.connected)
   const initConference = useConferenceStore(store => store.init)
+  const setLocalTracks = useLocalStore(store => store.setLocalTracks)
+  const leaveConference = useConferenceStore(store => store.leave)
   const clearScreenTrack = useLocalStore(store => store.clearScreenTrack)
-  // let { id, displayName, linkPrimary } = useParams() //get Id from url, should error check here I guess
-  let { session, user } = useParams() //get Id from url, should error check here I guess
+  let { session: sessionName, linkPrimary } = useParams() //get sessionID & linkedUserID from url
 
   const videoTrack = useLocalStore((store) => store.desktop)
   const desiredConnectionState = useScreenShareStore((store) => store.desiredConnectionState); //SHARE
@@ -58,6 +60,32 @@ export const ScreenShare = () => {
   const setDesiredConnectionState = useScreenShareStore((store) => store.setDesiredConnectionState);
   const setLinkAnnounced = useScreenShareStore((store) => store.setLinkAnnounced);
   const setCreatingTrack = useScreenShareStore((store) => store.setCreatingTrack);
+
+  /**
+   * TODO:
+   * - Load JitsiMeet
+   * - Connect to server 
+   * - - disconnect on unmount
+   * - IF connected is true:
+   * - - Join Conference
+   * - IF joined is true, check if a user with linkPrimary is in conference
+   * - - IF user is in conference, set link to true
+   * - - IF user is not in conference, set link to false
+   * 
+   * - IF link is false:
+   * - - show message "you seem to be not in the conference"
+   * - - disable share button with text "not connected"
+   * - IF link is true && share is true:
+   * - - set share button to active with text "stop sharing"
+   * - - Create screen track
+   * - - - IF track is created:
+   * - - - - attach track to local video
+   * - ELSE IF link is true && share is false:
+   * - - set share button to off with text "share"
+   * - - remove screen track
+
+   */
+
 
   // used to link screenshareuser to other user
   const announceLink = () => {
@@ -71,6 +99,10 @@ export const ScreenShare = () => {
     })
     // link was announced to true
     setLinkAnnounced(true);
+  }
+
+  const closeWindow = () => {
+    window.close()
   }
 
   // ScreenShare Method used to create a track for screenshare user
@@ -114,33 +146,37 @@ export const ScreenShare = () => {
   }
 
   const disposeConference = () => {
-    conference?.leave();
+    leaveConference()
   }
 
   const joinConfernce = () => {
-    initConference(session);
+    initConference(sessionName);
   }
 
   useEffect(() => {
+    //Connect to Server
     if (!jsMeet) {
       initJitsiMeet();
       return;
     }
-    if (!connected) {
-      connectServer(session);
+    if (!isConnected) {
+      connectServer(sessionName);
       return;
     }
+    if (!conferenceReady()) {
+      joinConfernce();
+      return;
+    }
+    conference?.setLocalParticipantProperty("linkedUser", linkPrimary);
 
     console.log(desiredConnectionState);
     if (desiredConnectionState === "SHARE") {
+
       if (!trackReady()) {
         createTrack();
         return;
       }
-      if (!conferenceReady()) {
-        joinConfernce();
-        return;
-      }
+
       // if (!linkAnnounced) {
       //   conference?.setDisplayName(displayName);
       //   announceLink();
@@ -150,15 +186,14 @@ export const ScreenShare = () => {
     if (desiredConnectionState === "INIT") {
       if (trackReady()) {
         disposeTrack();
-        
-        return; //why return here? shouldnt the link be disposed too? anyway
+        return;
       }
       if (linkAnnounced) {
         disposeLink();
         return;
       }
       if (conferenceReady()) {
-        disposeConference();
+        // disposeConference();
         return;
       }
     }
@@ -169,7 +204,21 @@ export const ScreenShare = () => {
       }
       setDesiredConnectionState("SHARE");
     }
-  },[jsMeet, connected, desiredConnectionState, conference, linkAnnounced, videoTrack])
+    if(desiredConnectionState === "LEAVE"){
+      window.close()
+      // disposeConference();
+      // closeWindow();
+      return
+    }
+  },[jsMeet, isConnected, desiredConnectionState, conference, linkAnnounced, videoTrack, users])
+
+  useEffect(() => {
+    console.log("screenshare original user id is ", linkPrimary)
+    console.log("Screenshare original user object is ", users[linkPrimary])
+    if(isJoined && users[linkPrimary] === undefined) {
+     setDesiredConnectionState("LEAVE")
+    }
+  }, [users, linkPrimary, isJoined])
 
   const startSharing = () => {
     setDesiredConnectionState("SHARE");

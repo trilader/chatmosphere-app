@@ -193,6 +193,7 @@ export const useConferenceStore = create<ConferenceStore>((set,get) => {
   const leave = () => { 
     const conference = get().conferenceObject
     conference?.leave()
+    set({isJoined:false})
   }
   const setConferenceName = (name) => {
     if(name.length < 1) return false

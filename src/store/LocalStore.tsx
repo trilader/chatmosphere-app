@@ -25,7 +25,7 @@ type Store = {
   setMyID: (id:string) => void
 } & User & ZoomPan
 
-export const useLocalStore = create<Store>((set,get) => {
+export const useLocalStore = create<Store>((set,get):Store => {
 
   const state = {
     id:"",
@@ -64,9 +64,6 @@ export const useLocalStore = create<Store>((set,get) => {
     const audioTrack = tracks.find(t=>t.getType() === 'audio')
     const videoTrack = tracks.find(t=>t.videoType==='camera')
     const desktopTrack = tracks.find(t=>t.videoType==='desktop')
-
-    // console.log("track object ", tracks.find(t=>t.videoType==='desktop'))
-    console.log("track object ", tracks)
     newState.video = videoTrack
     newState.audio = audioTrack
     newState.desktop = desktopTrack
