@@ -6,7 +6,7 @@ interface IButton {
   danger?: boolean
 }
 
-const buttonStyles = `
+export const Button = styled.button<IButton>`
   font-size: 1rem;
   display: flex;
   flex-direction: row;
@@ -15,6 +15,7 @@ const buttonStyles = `
   height: 50px;
   width: 165px;
   border-radius: 5px;
+  text-decoration: none;
   color: ${props => props.theme.primary['1']};
   border: 1px solid ${props => props.theme.primary['1']};
   background-color: ${props => props.theme.base['5']};
@@ -68,12 +69,4 @@ const buttonStyles = `
   &:focus {
     outline: none;
   }
-`
-
-export const Button = styled.button<IButton>`
-  ${buttonStyles}
-`
-
-export const LinkButton = styled.a<IButton>`
-  ${buttonStyles}
 `

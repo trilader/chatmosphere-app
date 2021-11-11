@@ -24,6 +24,9 @@ export const ScreenShareVideo: React.FC<{ track: VideoTrack }> = memo(({ track }
   useEffect(() => {
     room?.addTrack(track)
       .catch(error => { });//the track might have been added already, handle the promise error
+    return (() => {
+      //room?.removeTrack(track) # INFO should be correct way according to spec but removed causing error  https://jitsi.github.io/handbook/docs/dev-guide/dev-guide-ljm-api#jitsiconference
+    })
   }, [room, track])
 
   return (

@@ -33,20 +33,24 @@ export type AudioTrack = Track
 export type VideoTrack = Track
 export type DesktopTrack = Track 
 
-export type IUser = { id:ID, user?:any, mute:boolean, volume:number, pos:Point, audio?:AudioTrack, video?:VideoTrack, desktop?:DesktopTrack }
+export type IUser = { id:ID, user?:any, mute:boolean, volume:number, pos:Point, audio?:AudioTrack, video?:VideoTrack, desktop?:DesktopTrack, screenOf?:ID }
 type Users = { [id:string]:IUser }
+type IDesktopUser = { id:ID, linkedID:ID, user?:any, desktop?:VideoTrack} // ScreenSharingUser Linked to other User 
 type Point = {x:number, y:number}
 type ID = string
 
 export type IJitsiConference={
   on: (eventType:string,callback:(...rest)=>void) => boolean
+  off: (eventType:string,callback:(...rest)=>void) => boolean
   addCommandListener: (command:string,callback:(e:any)=>void) => boolean
   sendCommand: (command:string,payload:any) => boolean
   join:()=>void
   setDisplayName:(name:string)=>void
   addTrack:(track:Track)=>Promise<any>
+  removeTrack:(track:Track)=>Promise<any>
   myUserId:()=>ID
   leave:()=>void
+  setLocalParticipantProperty:(key:string,value:string)=>void
 }
 
 type ConferenceStore = {
@@ -87,9 +91,16 @@ export const useConferenceStore = create<ConferenceStore>((set,get) => {
   const produceAndSet = (callback:(newState:ConferenceStore)=>void)=>set(state => produce(state, newState => callback(newState)))
 
   // Private Helper Functions *******************************************
-  const _addUser = (id:ID, user?:any) :void => produceAndSet (newState => {
-    newState.users[id] = {id:id, user:user, mute:false, volume:1, pos:{x:0, y:0}}
+  const _addUser = (id:ID, user?:any) :void => {
+    console.log("Props are ", user._properties.linkedUser)
+    produceAndSet(newState => {
+      newState.users[id] = {id:id, user:user, mute:false, volume:1, pos:{x:0, y:0}}
+  })}
+
+  const _addDesktopUser = (id:ID, user?:any) :void => produceAndSet (newState => { 
+    // newState.users[id] = {id:id, user:user, mute:false, volume:1, pos:{x:0, y:0}, audio:undefined, video:undefined, desktop:undefined}
   })
+
   const _removeUser = (id:ID) :void => produceAndSet (newState => {
     delete newState.users[id]
   })
@@ -155,7 +166,19 @@ export const useConferenceStore = create<ConferenceStore>((set,get) => {
     set({isJoined:true})//only Local User -> could be in LocalStore
     const conference = get().conferenceObject
     conference?.setDisplayName(get().displayName)
-  } 
+  }
+
+  const _onPropertyChanged = (u) => {
+    console.log("Status changed to:", u)
+    if(u._properties.linkedUser) {
+      const linkedUser = u._properties.linkedUser
+      produceAndSet(newState => {
+        newState.users[u._id]['screenOf'] = linkedUser
+        // newState.users[linkedUser]['linkedScreen'] = u._id
+      })
+    }
+    //_properties
+  }
 
   // # Public functions *******************************************
   const init = (conferenceID:string):void => {
@@ -173,11 +196,11 @@ export const useConferenceStore = create<ConferenceStore>((set,get) => {
       conference.on(JitsiMeetJS.events.conference.CONFERENCE_JOINED, _onConferenceJoined)
       conference.on(JitsiMeetJS.events.conference.TRACK_MUTE_CHANGED, _onTrackMuteChanged);
       conference.on(JitsiMeetJS.events.conference.CONFERENCE_ERROR, _onConferenceError);
+      conference.on(JitsiMeetJS.events.conference.PARTICIPANT_PROPERTY_CHANGED, _onPropertyChanged)
       //conference.on(JitsiMeetJS.events.conference.DISPLAY_NAME_CHANGED, onUserNameChanged);
       // conference.on(JitsiMeetJS.events.conference.TRACK_AUDIO_LEVEL_CHANGED, on_remote_track_audio_level_changed);
       //conference.on(JitsiMeetJS.events.conference.PHONE_NUMBER_CHANGED, onPhoneNumberChanged);
       conference.addCommandListener("pos", _onPositionReceived)
-      // r.on(JitsiMeetJS.events.conference.PARTICIPANT_PROPERTY_CHANGED, (e) => console.log("Property Changed ", e))
       window.addEventListener('beforeunload', leave) //does this help?  
       window.addEventListener('unload', leave) //does this help?
       conference.join()
@@ -188,7 +211,7 @@ export const useConferenceStore = create<ConferenceStore>((set,get) => {
   }
 
   const join = () => {
-
+    // TODO: Either extract conference.join from init function or make join a simlink to init or remove join function [No, if we can leave we shall also be able to join back]? 
   }
   const leave = () => { 
     const conference = get().conferenceObject

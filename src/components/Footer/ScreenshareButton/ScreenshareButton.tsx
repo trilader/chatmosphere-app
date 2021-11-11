@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { useConferenceStore } from "../../../store/ConferenceStore"
 import { useLocalStore } from "../../../store/LocalStore"
-import { LinkButton } from "../../common/Buttons/Button"
+import { Button } from "../../common/Buttons/Button"
 
 
 export const ScreenshareButton = () => {
@@ -16,6 +16,6 @@ export const ScreenshareButton = () => {
 	}
 
 	// return <Button onClick={() => toggleScreenshare()}>Screenshare</Button>
-	return <LinkButton href={link} target="_blank">Screenshare</LinkButton>
+	return <Button as="a" href={link} target="_blank">Screenshare</Button>
 	
 }

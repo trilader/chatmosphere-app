@@ -1,24 +1,27 @@
 //shitty naming - Video for others
 
-import {useCallback, useEffect, useRef } from 'react';
+import {useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useConferenceStore} from '../../store/ConferenceStore';
+import { useLocalStore } from '../../store/LocalStore';
 
 const Video = styled.video`
-  width: 350px;
+  width: 450px;
   height: auto;
+  left: 250px;
   position:absolute;
   object-position: 50% 50%;
   display: block;
   object-fit: cover;
 `
-const userRequest = state => state.users
 
 export const Screen = ({ id, linkedId }) => {
   const myRef: any = useRef()
   const screenTrack = useConferenceStore(useCallback(store => store.users[id].video, [id]))
-  const linkedUser = useConferenceStore(state => state.users[linkedId])
-  // const linkedPosition = useConferenceStore(useCallback(store => store.users[userObject?.user?._properties?.linkedUser]['pos'], [userObject]))
+  const linkedUser = useConferenceStore(useCallback(state => state.users[linkedId], [linkedId]))
+  const myPos = useLocalStore(store => store.pos)
+
+
 
   useEffect(() => {
     const el = myRef.current
@@ -28,13 +31,17 @@ export const Screen = ({ id, linkedId }) => {
     })
   }, [screenTrack])
 
-  useEffect(() => {
-    console.log("User exists", linkedUser)
-    // const el = myRef.current
-    // el.style.transform = `translate(${linkedPosition.x}px, ${linkedPosition.y}px)`
-  }, [linkedUser])
-
   return (
-    <Video autoPlay={true} ref={myRef} className={`remoteScreen videoTrack`} id={`${id}screen`}/>
-  )
+          <>
+          { linkedUser ?
+            <div style={{position:'absolute', left:`${linkedUser.pos.x}px`, top:`${linkedUser.pos.y}px`}} className="userContainer">
+              <Video autoPlay={true} ref={myRef} className={`remoteScreen videoTrack`} id={`${id}screen`}/>
+            </div>
+            : 
+            <div style={{position:'absolute', left:`${myPos.x}px`, top:`${myPos.y}px`}} className="userContainer">
+              <Video autoPlay={true} ref={myRef} className={`remoteScreen videoTrack`} id={`${id}screen`}/>
+            </div>
+          }    
+          </>
+        )
 }

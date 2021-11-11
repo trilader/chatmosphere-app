@@ -14,6 +14,7 @@ export const User = ({id, user}) => {
   const myVolume = useConferenceStore(useCallback(store => store.users[id]['volume'], [id]))
   const isMute = useConferenceStore(useCallback(store => store.users[id]['mute'],[id]))
   const calculateVolume = useConferenceStore(useCallback(store => store.calculateVolume, []))
+
   useEffect(() => {
     calculateVolume(id)
   },[id, calculateVolume, myPos])
