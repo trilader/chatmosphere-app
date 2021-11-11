@@ -1,6 +1,6 @@
 import produce from "immer";
 import create from "zustand";
-import { Track, User } from "./ConferenceStore";
+import { Track, IUser } from "./ConferenceStore";
 import { panOptions, transformWrapperOptions } from "../components/PanWrapper/panOptions";
 import { mountStoreDevtool } from "simple-zustand-devtools";
 
@@ -23,7 +23,7 @@ type Store = {
   clearAudioTrack: () => void
   clearScreenTrack: () => void
   setMyID: (id:string) => void
-} & User & ZoomPan
+} & IUser & ZoomPan
 
 export const useLocalStore = create<Store>((set,get):Store => {
 

@@ -103,6 +103,7 @@ export const useConnectionStore = create<IStore>((set, get) => {
     // const result = await promise
     return await jitsiMeetPromise
   }
+  // TODO: Conference Name is not used - refactor and clear
   const connectServer = (conferenceName: string) => {
     //Since jsMeet object is async (Promise), we should use also Promise to create a connection and connect. Because this is depandent to jsMeet object
     //But this function should be called only once if there is a current connection object.

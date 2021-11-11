@@ -6,7 +6,7 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
 import { Home } from "./pages/Home/Home"
 import { Enter } from "./pages/Enter/Enter"
 import { Session } from "./pages/Session/Session"
-import ScreenShare from './pages/ScreenShare/ScreenShare'
+import {ScreenShareContainer} from './pages/ScreenShare/ScreenShareContainer'
 
 const AppContainer = styled.div`
   text-align: center;
@@ -31,8 +31,8 @@ function App() {
             <Session />
           </Route>
 
-          <Route path="/screenshare/:session/:linkPrimary">
-            <ScreenShare />
+          <Route path="/screenshare/:sessionName/:linkPrimary">
+            <ScreenShareContainer />
           </Route>
 
           <Route path="/">

@@ -12,10 +12,13 @@ const Video = styled.video`
   display: block;
   object-fit: cover;
 `
+const userRequest = state => state.users
 
-export const Screen: React.FC<{ id:string }> = ({ id }) => {
+export const Screen = ({ id, linkedId }) => {
   const myRef: any = useRef()
   const screenTrack = useConferenceStore(useCallback(store => store.users[id].video, [id]))
+  const linkedUser = useConferenceStore(state => state.users[linkedId])
+  // const linkedPosition = useConferenceStore(useCallback(store => store.users[userObject?.user?._properties?.linkedUser]['pos'], [userObject]))
 
   useEffect(() => {
     const el = myRef.current
@@ -24,6 +27,12 @@ export const Screen: React.FC<{ id:string }> = ({ id }) => {
       screenTrack?.detach(el)
     })
   }, [screenTrack])
+
+  useEffect(() => {
+    console.log("User exists", linkedUser)
+    // const el = myRef.current
+    // el.style.transform = `translate(${linkedPosition.x}px, ${linkedPosition.y}px)`
+  }, [linkedUser])
 
   return (
     <Video autoPlay={true} ref={myRef} className={`remoteScreen videoTrack`} id={`${id}screen`}/>

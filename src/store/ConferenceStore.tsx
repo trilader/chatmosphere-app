@@ -33,8 +33,8 @@ export type AudioTrack = Track
 export type VideoTrack = Track
 export type DesktopTrack = Track 
 
-export type User = { id:ID, user?:any, mute:boolean, volume:number, pos:Point, audio?:AudioTrack, video?:VideoTrack, desktop?:DesktopTrack }
-type Users = { [id:string]:User }
+export type IUser = { id:ID, user?:any, mute:boolean, volume:number, pos:Point, audio?:AudioTrack, video?:VideoTrack, desktop?:DesktopTrack }
+type Users = { [id:string]:IUser }
 type Point = {x:number, y:number}
 type ID = string
 
