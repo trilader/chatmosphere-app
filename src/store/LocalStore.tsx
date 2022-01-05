@@ -20,6 +20,11 @@ type Settings = {
   selectedAudioInputDevice?: string
   selectedAudioOutputDevice?: string
   selectedCameraDevice?: string
+  audioProcessingEnabled?: boolean
+  echoCancellationEnabled?: boolean
+  noiseSuppressionEnabled?: boolean
+  autoGainEnabled?: boolean
+  stereoEnabled?: boolean
 }
 
 type Store = {
@@ -35,6 +40,8 @@ type Store = {
   text: string
   settings: Settings | undefined
   availableDevices: MediaDeviceInfo[]
+  houstonWeNeedAReload: () => void
+  needsReload: boolean
 } & User & ZoomPan
 
 export const useLocalStore = create<Store>((set,get) => {
@@ -52,7 +59,8 @@ export const useLocalStore = create<Store>((set,get) => {
     zoom: false,
     chatmoClient: false,
     scale:1,
-    text:''
+    text:'',
+    needsReload: false,
   }
 
   // # Private Functions
@@ -82,6 +90,10 @@ export const useLocalStore = create<Store>((set,get) => {
 
   const selectSettings = (obj: Settings | undefined) => {
     set({ settings: obj });
+  }
+
+  const houstonWeNeedAReload = () => {
+    set({ needsReload: true });
   }
 
   const setLocalTracks = (tracks) => _produceAndSet(newState => {
@@ -136,7 +148,8 @@ export const useLocalStore = create<Store>((set,get) => {
   setAvailableDevices,
   setMyID,
   onPanChange,
-  setLocalText
+  setLocalText,
+  houstonWeNeedAReload,
 }
 })
 
