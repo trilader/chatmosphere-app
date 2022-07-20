@@ -17,6 +17,7 @@ const LocalVideo:React.FC<{track:IVideoTrack}> = memo(({track}) => {
   const room = useConferenceStore(store => store.conferenceObject)
 
   useEffect(() => {
+    console.debug("Add Video Track:", track, "in room:", room)
     room?.addTrack(track) //TODO should be done in store I think?
       .catch(error => console.log(error))//the track might have been added already, handle the promise error
     return () => {

@@ -135,7 +135,7 @@ export const useConferenceStore = create<IConferenceStore>((set,get) => {
     // make sure there is a conference Name
     const enteredConferenceName = process.env.REACT_APP_DEMO_SESSION || conferenceID.length > 0 ? conferenceID : get().conferenceName || "chatmosphere"
     set({conferenceName:enteredConferenceName})
-    const conferenceName = secureConferenceName(enteredConferenceName, process.env.REACT_APP_SESSION_PREFIX)
+    const conferenceName = enteredConferenceName
     if(connection && JitsiMeetJS && conferenceName) {
       const conference = connection.initJitsiConference(conferenceName, conferenceOptions) //TODO before unload close connection
       conference.on(JitsiMeetJS.events.conference.USER_JOINED, _addUser)

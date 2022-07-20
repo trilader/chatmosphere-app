@@ -9,6 +9,7 @@ const customConnectionOptions = {
     muc: `conference.${process.env.REACT_APP_SERVICE_URL}`,
     //# (optional) specify the focus component to use (part of the XMPP stuff). defaults to the value of hosts.domain if not set.
     focus: `focus.${process.env.REACT_APP_SERVICE_URL}`,
+    anonymousdomain: `guest.${process.env.REACT_APP_SERVICE_URL}`,
   },
 
   //# External Connect Urlcan speed up connection if you're using bosh; probably https://$JITSI_MEET_WEB_DOMAIN/http-pre-bind

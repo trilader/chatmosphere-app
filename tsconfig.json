@@ -18,12 +18,12 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx",
+    "jsx": "preserve",
     "noImplicitAny": false
   },
   "include": [
     "src",
     "src/**/*",
-    "global.d.ts"  
+    "global.d.ts"
   ]
 }

@@ -45,6 +45,8 @@ export const LocalStoreLogic = () => {
 
   // TODO: Refactor
   useEffect(() => {
+    jsMeet?.setLogLevel(jsMeet?.logLevels.DEBUG);
+    console.debug("JS Meet:", jsMeet)
     jsMeet
       ?.createLocalTracks({
         devices: ["audio", "video"],
