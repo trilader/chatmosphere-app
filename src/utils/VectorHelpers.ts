@@ -9,7 +9,7 @@ export const getVectorDistance = (p1:IVector2, p2:IVector2):number => {
 
 export const mapVolumeToDist = (max:number, dist:number):number => {
 	const volume = 1 - dist/max
-	const p = volume > 0 ? volume : 0
+	const p = volume > 0.02 ? volume : 0.02
 	return p
 }
 

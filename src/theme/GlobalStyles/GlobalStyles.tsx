@@ -78,6 +78,20 @@ export const GlobalStyles = createGlobalStyle<{theme:ThemeType}>`
   a {
     cursor: default;
   }
+
+  .screenshare-default {
+    background: none;
+    width: 200px;
+    max-height: 200px;
+    object-position: 50% 50%;
+    display: block;
+  }
+
+  .screenshare-zoom {
+    background: none;
+    display: block;
+  }
+
   //outerArea
   .react-transform-component{
     width: 100vw  !important;
@@ -93,4 +107,35 @@ export const GlobalStyles = createGlobalStyle<{theme:ThemeType}>`
   .react-transform-element:active{
     cursor:grabbing;
   }
+  #textinput{ 
+    width: 100%;
+    width: -moz-available;          /* For Mozzila */
+    width: -webkit-fill-available;  /* For Chrome */
+    width: stretch;
+    background-color:rgba(23,116,203,0.2);
+    border:none;
+    border-radius:10px;
+    margin-top:10px;
+    height:clamp(3%,50px,10%);
+    position:relative;
+    display: inline-block;
+  }
+
+  .block-chat{
+    border-radius:10px;
+    display:block;
+    left:0px;
+    height:300px;
+    width:max-content;
+    backround-color:rgba(23,116,203,0.2);
+    
+  }
+  .hide-chat{
+    display:none;
+  }
+
+  .last-item{
+
+  }
+
 `

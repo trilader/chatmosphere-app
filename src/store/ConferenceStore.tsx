@@ -5,7 +5,7 @@ import { conferenceOptions } from '../components/JitsiConnection/jitsiOptions';
 import { getVolumeByDistance } from '../utils/VectorHelpers';
 import { useConnectionStore } from './ConnectionStore';
 import { useLocalStore } from './LocalStore';
-import { secureConferenceName } from "../utils/secureConferenceName"
+import { panOptions } from '../components/PanWrapper/panOptions';
 
 // # TS DEFINITIONS *******************************************
 
@@ -17,23 +17,55 @@ declare global {
 
 // # IMPLEMENTATIONS *******************************************
 
-export const useConferenceStore = create<IConferenceStore>((set,get) => {
+const fnv32a = (str: String): number => {
+  var FNV1_32A_INIT = 0x811c9dc5;
+  var hval = FNV1_32A_INIT;
+  for ( var i = 0; i < str.length; ++i )
+  {
+    hval ^= str.charCodeAt(i);
+    hval += (hval << 1) + (hval << 4) + (hval << 7) + (hval << 8) + (hval << 24);
+    hval &= 0xffffffff;
+  }
+  return hval >>> 0;
+}
 
+export const useConferenceStore = create<IConferenceStore>((set,get) => {
+  let localStoreUsername:string;
+  try {
+    const localusername = localStorage.getItem('jitsiUsername')
+    localStoreUsername =  localusername!== null?localusername:'Unfriendly Sphere'
+  } catch (error) {
+    localStoreUsername = 'Unfriendly Sphere'
+  }
   const initialState = {
     conferenceObject:undefined,
     conferenceName: process.env.REACT_APP_DEMO_SESSION || "chatmosphere",
     isJoined:false,
     users:{},
-    displayName:"Friendly Sphere",
+    displayName:localStoreUsername,
     error:undefined,
-    messages:[]
+    messages:[],
+    unreadMessages:0
   }
 
   const produceAndSet = (callback:(newState:IConferenceStore)=>void)=>set(state => produce(state, newState => callback(newState)))
 
+  const _addMessage = (id:string, message:string, date:Date): void => produceAndSet ( newState => {
+    newState.messages.push({id:id,text:message,nr:date.getUTCDate()});
+    newState.unreadMessages = newState.unreadMessages +1;
+  })
+
+  const clearUnreadMessages = ():void => produceAndSet( newState => {
+    newState.unreadMessages = 0;
+  })
+
   // Private Helper Functions *******************************************
   const _addUser = (id:ID, user?:any) :void => produceAndSet (newState => {
-    newState.users[id] = {id:id, user:user, mute:false, properties:{}, volume:1, pos:{x:0, y:0}}
+
+    let d = (fnv32a("d" + id) / 0xffffffff) * 2*Math.PI;
+    let r = (fnv32a("r" + id) / 0xffffffff) * 200 + 200;
+    let initialPosition = { x: panOptions.room.size.x / 2 - Math.sin(d) * r, y: panOptions.room.size.y / 2 - Math.cos(d) * r };
+    newState.users[id] = {id:id, user:user, mute:false, properties:{}, volume:1, pos: initialPosition, zoom: false, chatmoClient: false }
   })
   const _removeUser = (id:ID) :void => produceAndSet (newState => {
     delete newState.users[id]
@@ -41,7 +73,7 @@ export const useConferenceStore = create<IConferenceStore>((set,get) => {
   const _addAudioTrack = (id:ID, track:IMediaTrack) => produceAndSet (newState => {
     if(newState.users[id]) 
     {
-      const JitsiMeetJS = useConnectionStore.getState().jsMeet 
+      const JitsiMeetJS = useConnectionStore.getState().jsMeet
       track.addEventListener(JitsiMeetJS?.events.track.TRACK_AUDIO_OUTPUT_CHANGED,deviceId =>console.log(`track audio output device was changed to ${deviceId}`))
       newState.users[id].audio = track
       newState.users[id]['mute'] = track.isMuted()
@@ -52,7 +84,7 @@ export const useConferenceStore = create<IConferenceStore>((set,get) => {
   // })
   const _addVideoTrack = (id:ID, track:IMediaTrack):void => produceAndSet (newState => {
     if(newState.users[id]) {
-      const JitsiMeetJS = useConnectionStore.getState().jsMeet 
+      const JitsiMeetJS = useConnectionStore.getState().jsMeet
       track.addEventListener(JitsiMeetJS?.events.track.TRACK_VIDEOTYPE_CHANGED, (e)=>_onVideoTypeChanged(e, id))
       newState.users[id].video = track
       newState.users[id].videoType = track.videoType === "desktop" ? "desktop" : "camera" //set videoType directly
@@ -69,7 +101,17 @@ export const useConferenceStore = create<IConferenceStore>((set,get) => {
     _updateUserPosition(pos.id, {x:pos.x, y:pos.y})
   }
   const _updateUserPosition = (id:ID, pos:IVector2):void => produceAndSet (newState => {
-    if(newState.users[id]) newState.users[id]['pos'] = pos
+    if(newState.users[id]) {
+        newState.users[id]['pos'] = pos
+        newState.users[id]['chatmoClient'] = true
+    }
+  })
+  const _onLinkReceived = (e:any):void => {
+    const link = JSON.parse(e.value)
+    _updateUserLink(link.id, link.main)
+  }
+  const _updateUserLink = (id:ID, main:string):void => produceAndSet (newState => {
+    if(newState.users[id]) newState.users[id]['linkMain'] = main
   })
   const _onTrackMuteChanged = (track:IMediaTrack):void => {
     if(track.getType() === 'video') return
@@ -107,8 +149,25 @@ export const useConferenceStore = create<IConferenceStore>((set,get) => {
   const _onConferenceJoined = () => {
     set({isJoined:true})//only Local User -> could be in LocalStore
     const conference = get().conferenceObject
-    conference?.setDisplayName(get().displayName)
+    // console.log(get().displayName)
+    const jitsiname = localStorage.getItem('jitsiUsername');
+    const url =  window.location.href;
+    if (jitsiname!==null && !/sphere/i.test(jitsiname)){
+      conference?.setDisplayName(jitsiname)
+    }
+    else{
+      console.log('SHOULD CHANGE')
+
+    }
   }
+
+  // const _onMessageReceived = (id,message,time) => {
+  //   if (time===undefined){
+  //     time = new Date().toISOString();
+  //   }
+  //   time = new Date(Date.parse(time))
+  //   _addMessage(id,message,time)
+  // }
 
   const _onMessageReceived = (id:string, text:string, nr:number) => {
     set((store) => ({messages: [...store.messages, {id:id, text:text, nr:nr}]}))
@@ -123,8 +182,8 @@ export const useConferenceStore = create<IConferenceStore>((set,get) => {
     })
   }
 
-  const _onUserNameChanged = (e, t) => {
-    // TODO Implement singular event when user changes name (now its updating every letter)
+  const _onUserNameChanged = (id:string,displayName:string) => {
+    console.log(id,displayName)
   }
 
 
@@ -152,8 +211,10 @@ export const useConferenceStore = create<IConferenceStore>((set,get) => {
       // conference.on(JitsiMeetJS.events.conference.TRACK_AUDIO_LEVEL_CHANGED, on_remote_track_audio_level_changed);
       //conference.on(JitsiMeetJS.events.conference.PHONE_NUMBER_CHANGED, onPhoneNumberChanged);
       conference.addCommandListener("pos", _onPositionReceived)
-      window.addEventListener('beforeunload', leaveConference) //does this help?  
+      conference.addCommandListener("link", _onLinkReceived)
+      window.addEventListener('beforeunload', leaveConference) //does this help?
       window.addEventListener('unload', leaveConference) //does this help?
+      conference.setDisplayName(get().displayName)
       conference.join()
       set({conferenceObject:conference,error:undefined})
     } else {
@@ -164,7 +225,13 @@ export const useConferenceStore = create<IConferenceStore>((set,get) => {
   const join = () => {
 
   }
-  const leaveConference = () => { 
+
+  const myUserId = () => {
+    const conference = get().conferenceObject
+    return conference!.myUserId()
+  }
+
+  const leaveConference = () => {
     const conference = get().conferenceObject
     conference?.leave()
   }
@@ -174,10 +241,28 @@ export const useConferenceStore = create<IConferenceStore>((set,get) => {
     return newName
   }
 
-  const setDisplayName = (name) => {
-    set({displayName:name})
+  const sendTextMessage = (message:string) =>{
     const conference = get().conferenceObject
-    conference?.setDisplayName(name)
+    // console.log(`send: ${message}`)
+    conference?.sendTextMessage(message)
+  }
+
+
+  const setDisplayName = (name) => {
+
+    if (!/sphere/i.test(name)){
+      try {
+        localStorage.setItem('jitsiUsername',name)
+      } catch (error) {
+        console.error('cannot save username to local Storage')
+      }
+      set({displayName:name})
+      const conference = get().conferenceObject
+      conference?.setDisplayName(name)
+    }
+    else{
+      // pass
+    }
   }
   const calculateVolume = (id:ID):void => produceAndSet (newState => {
     const localUserPosition:IVector2 = useLocalStore.getState().pos //check if this is updated or kept by closure
@@ -192,6 +277,10 @@ export const useConferenceStore = create<IConferenceStore>((set,get) => {
       newState.users[key]['volume'] = getVolumeByDistance(localPos, user.pos)
       return null
     })
+  })
+
+  const setZoom = (id:ID, val:boolean):void => produceAndSet (newState => {
+    if(newState.users[id]) newState.users[id].zoom = val
   })
 
   // TODO: Not used yet
@@ -215,10 +304,14 @@ export const useConferenceStore = create<IConferenceStore>((set,get) => {
     joinConference: join,
     leaveConference,
     setConferenceName,
+    sendTextMessage,
     setDisplayName,
     calculateVolume,
     calculateVolumes,
-    addLocalTrackToConference
+    addLocalTrackToConference,
+    myUserId,
+    setZoom,
+    clearUnreadMessages
   }
 })
 

@@ -5,6 +5,36 @@ import {
   jitsiInitOptions,
 } from "./../components/JitsiConnection/jitsiOptions"
 
+export function checkLocalStorageBool(optionName: string): boolean | null {
+  const settingEnabled = localStorage.getItem(optionName);
+  if (settingEnabled === 'true') {
+    return true;
+  } else if (settingEnabled === 'false') {
+    return false;
+  }
+  return null;
+}
+
+function setAudioOptionsFromStorage() {
+  const apEnabled = checkLocalStorageBool('jitsiAudioProcessingEnabled');
+  jitsiInitOptions.disableAP =
+    (apEnabled === null) ? jitsiInitOptions.disableAP : !apEnabled;
+  const ecEnabled = checkLocalStorageBool('jitsiEchoCancellationEnabled');
+  jitsiInitOptions.disableAEC =
+    (ecEnabled === null) ? jitsiInitOptions.disableAEC : !ecEnabled;
+  const npEnabled = checkLocalStorageBool('jitsiNoiseSuppressionEnabled');
+  jitsiInitOptions.disableNS =
+    (npEnabled === null) ? jitsiInitOptions.disableNS : !npEnabled;
+  const agEnabled = checkLocalStorageBool('jitsiAutoGainEnabled');
+  jitsiInitOptions.disableAGC =
+    (agEnabled === null) ? jitsiInitOptions.disableAGC : !agEnabled;
+  const stereoEnabled = checkLocalStorageBool('jitsiStereoEnabled');
+  jitsiInitOptions.audioQuality =
+    (jitsiInitOptions.audioQuality == null) ? {} : jitsiInitOptions.audioQuality
+  jitsiInitOptions.audioQuality.stereo =
+    (stereoEnabled === null) ? jitsiInitOptions.audioQuality.stereo : stereoEnabled;
+}
+
 // ****************************************************************
 // CONNECTION STORE
 // ****************************************************************
@@ -31,6 +61,8 @@ export const useConnectionStore = create<IConnectionStore>((set, get) => {
     jitsiMeetPromise = new Promise((res, rej) => {
       const jitsiMeet = async () => window.JitsiMeetJS
       jitsiMeet().then((jsMeet) => {
+        setAudioOptionsFromStorage();
+
         jsMeet.setLogLevel(jsMeet.logLevels.ERROR)
         //without init you can not create local tracks
         jsMeet.init(jitsiInitOptions)

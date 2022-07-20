@@ -1,13 +1,15 @@
 declare type JitsiMeetJS = any
 
 declare type IMediaTrack = {
-  track:{id:string}
+  track: {id: string, label: string}
+  deviceId: string
   containers:any[]
   videoType?:string
   getType: () => deviceType
   dispose: () => promise
   isLocal: () => boolean
   isMuted: () => boolean
+  disposed: boolean
   mute: () => void
   unmute: () => void
   addEventListener: (eventType:string,callback:(...rest)=>void) => boolean
@@ -28,17 +30,18 @@ declare type IJitsiConference={
   addCommandListener: (command:string,callback:(e:any)=>void) => boolean
   sendCommand: (command:string,payload:any) => boolean
   join:()=>void
+  sendTextMessage:(text:string)=>void
   setDisplayName:(name:string)=>void
   addTrack:(track:IMediaTrack)=>Promise<any>
   removeTrack:(track:IMediaTrack)=>Promise<any>
+  replaceTrack: (oldTrack: IMediaTrack, newTrack: IMediaTrack) => Promise<any>
   myUserId:()=>ID
   setReceiverConstraints:(object)=>void
   leave:()=>void
+  isJoined: () => boolean
   setLocalParticipantProperty:(key:string,value:any)=>void
-  sendTextMessage:(txt:string)=>void
   getLocalTracks: () => IMediaTrack[]
   getLocalVideoTrack: () => IVideoTrack
-  replaceTrack:(oldTrack:IMediaTrack,newTrack:IMediaTrack)=>Promise<any>
 }
 
 declare interface IJitsiEvents {
@@ -70,19 +73,41 @@ declare interface IJitsiEvents {
 declare type Vector2 = {x:number, y:number}
 
 //Feels like ZoomPan doesnt belong to LocalStore; maybe state of panHandler or own store?
- declare type ZoomPan = {
+declare type ZoomPan = {
   pos:Vector2
   pan:Vector2 
   scale:number
   onPanChange: (params:any) => void
-} 
+}
+
+declare type Settings = {
+  unchanged?: boolean
+  error?: any
+  selectedAudioInputDevice?: string
+  selectedAudioOutputDevice?: string
+  selectedCameraDevice?: string
+  audioProcessingEnabled?: boolean
+  echoCancellationEnabled?: boolean
+  noiseSuppressionEnabled?: boolean
+  autoGainEnabled?: boolean
+  stereoEnabled?: boolean
+}
 
 declare type ILocalStore = {
+  setLocalText: (newText:string) => void
   setLocalPosition: (newPosition:IVector2) => void
   setLocalTracks: (tracks:Track[]) => void
+  setMicAndCamera: (micTrack: Track | undefined, camTrack: Track | undefined) => void
   toggleMute: () => void
+  selectSettings: (obj: Settings | undefined) => void
   clearLocalTracks: () => void
+  setAvailableDevices: (deviceInfos: MediaDeviceInfo[]) => void
   setMyID: (id:string) => void
+  text: string
+  settings: Settings | undefined
+  availableDevices: MediaDeviceInfo[]
+  houstonWeNeedAReload: () => void
+  needsReload: boolean
   calculateUsersInRadius:(myPos:IVector2)=>void
   calculateUserInRadius:(id:ID)=>void
   calculateUsersOnScreen:()=>void
@@ -104,6 +129,15 @@ declare type deviceType = "audio" | "video" | "desktop"
 
 declare type IMediaDevices = {
   isDevicePermissionGranted: (type?: deviceType) => Promise<boolean>
+  enumerateDevices: (callback: (deviceInfos: MediaDeviceInfo[]) => void) => void
+  setAudioOutputDevice: (deviceId: string) => void
+  getAudioOutputDevice: () => string
+}
+
+declare type LocalTrackOptions = {
+  devices: deviceType[]
+  cameraDeviceId?: string
+  micDeviceId?: string
 }
 
 declare type IJsMeet = {
@@ -111,8 +145,8 @@ declare type IJsMeet = {
   addTrack: (track: IMediaTrack) => void
   events: IJitsiEvents
   mediaDevices: IMediaDevices
-  createLocalTracks: (
-    options: { devices: deviceType[] }
+  createLocalTracks: ( // see https://jitsi.github.io/handbook/docs/dev-guide/dev-guide-ljm-api#jitsimeetjs
+    options?: LocalTrackOptions,
   ) => Promise<IMediaTrack[]>
   JitsiConnection: any
 }
@@ -150,6 +184,10 @@ declare type IConferenceStore = {
   replaceLocalTrackInConference?: (newTrack:IMediaTrack, oldTrack:IMediaTrack) => void
   addLocalTrackToConference?: (newTrack:IMediaTrack) => void
   messages: Array<{id:string, text:string, nr:number}>
+  unreadMessages: number
+  sendTextMessage:(text:string)=>void
+  clearUnreadMessages:()=> void
+  setZoom: (id:ID, val:boolean) => void
 }
 
 declare type IConnectionStore = {
@@ -179,7 +217,21 @@ declare interface IJitsiInitOptions {
 
 // Conference STore
 //TODO: VideoType should be used to determine if desktop or camera is show 
-declare type IUser = { id:ID, user?:any, mute:boolean, volume:number, pos:Point, properties?:IUserProperties, audio?:IAudioTrack, video?:IVideoTrack, videoType?:string, onStage?:boolean }
+declare type IUser = {
+  id:ID,
+  user?:any,
+  mute:boolean,
+  volume:number,
+  pos:Point,
+  properties?:IUserProperties,
+  audio?:IAudioTrack,
+  video?:IVideoTrack,
+  videoType?:string,
+  onStage?:boolean,
+  linkMain?:string,
+  zoom?:boolean,
+  chatmoClient?:boolean
+}
 declare type IUsers = { [id:string]:IUser }
 declare type ID = string
 declare type IUserProperties = Record<string, string>
@@ -191,13 +243,19 @@ type ConferenceStore = {
   users: IUsers
   displayName:string
   error:any
+  messages: Array<{id:string, text:string, nr:number}>
+  unreadMessages: number
 } & ConferenceActions & UserActions
 
 type ConferenceActions = {
   init: (conferenceID:string) => void
+  myUserId: () => ID
   join: () => void
   leave: () => void
   setConferenceName: (name:string) => boolean
+  setZoom: (id:ID, val:boolean) => void
+  sendTextMessage:(text:string)=> void
+  clearUnreadMessages:()=> void
 }
 
 type UserActions = {

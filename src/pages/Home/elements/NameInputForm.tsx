@@ -1,6 +1,9 @@
 import * as React from 'react'
 import styled from 'styled-components'
+import { setConstantValue } from 'typescript'
 import { Info } from '../../../components/common/Info/Info'
+import { UserNameInputField } from '../../../components/UserNameInputField/UserNameInputField'
+// import create from 'zustand'
 
 const Form = styled.form`
   width: 340px;
@@ -12,7 +15,7 @@ const Fieldset = styled.fieldset`
   padding: 0;
   margin: 10px 0 0 0;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
 `
 
 const Label = styled.label`
@@ -65,11 +68,30 @@ const InfoBubble = styled(Info)`
 
 `
 
-export const NameInputForm = ({ defaultSessionName, onSubmit, handleChange }) => {
+export const NameInputForm = ({ defaultSessionName, onSubmit, handleChange, handleUserChange, userName}) => {
+  // navigator.mediaDevices.enumerateDevices().then(console.log);
+  const [devices, setDevices] = React.useState<Array<any>>([])
+
+  const constraints  = {
+    audio: false,
+    video: true
+    };
+  if (devices.length===0){
+    navigator.mediaDevices.enumerateDevices().then((res:Array<MediaDeviceInfo>) => {
+      setDevices(res)
+    });
+  }
+
 	return (
 		<Form onSubmit={onSubmit}>
-			<Label htmlFor="sessionName">Set Session Name</Label>
+			{/* <Label htmlFor="sessionName">Set Session Name</Label> */}
 			<Fieldset>
+        <UserNameInputField userName={userName} handleUserChange={handleUserChange}></UserNameInputField>
+        {/* <Label htmlFor="choosecamera">Choose camera </Label>
+        <select name="camera" id="camera">
+          {  devices.map(v => <option key={v.devideId} value={v.deviceId}> {v.label} </option>)}
+        </select> */}
+        <Label htmlFor="sessionName">Set Session Name</Label>
 				<InputField
 					name="sessionName"
 					type="text"

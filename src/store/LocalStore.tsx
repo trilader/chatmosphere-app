@@ -12,12 +12,18 @@ export const useLocalStore = create<ILocalStore>((set, get) => {
   const state = {
     id: "",
     mute: false,
+    settings: undefined,
+    availableDevices: [],
     volume: 1,
     video: undefined,
     audio: undefined,
     pos: panOptions.user.initialPosition,
     pan: { x: transformWrapperOptions.defaultPositionX || 0, y: transformWrapperOptions.defaultPositionY || 0 },
+    zoom: false,
+    chatmoClient: false,
     scale: 1,
+    text:'',
+    needsReload: false,
     onStage: false,
     stageVisible: true,
     stageMute: false,
@@ -34,6 +40,9 @@ export const useLocalStore = create<ILocalStore>((set, get) => {
   const setLocalPosition = (newPosition) => {
     set({ pos: newPosition })
   }
+const setLocalText = (newText:string)=>  {
+    set({text:newText})
+  }
 
   const toggleMute = () => {
     const audioTrack = get().audio
@@ -47,6 +56,14 @@ export const useLocalStore = create<ILocalStore>((set, get) => {
     }
   }
 
+  const selectSettings = (obj: Settings | undefined) => {
+    set({ settings: obj });
+  }
+
+  const houstonWeNeedAReload = () => {
+    set({ needsReload: true });
+  }
+
   const setLocalTracks = tracks => _produceAndSet(newState => {
     const audioTrack = tracks.find(t => t.getType() === "audio")
     const videoTrack = tracks.find(t => t.getType() === "video") // second array el should be video
@@ -56,12 +73,21 @@ export const useLocalStore = create<ILocalStore>((set, get) => {
     if(audioTrack) newState.audio = audioTrack
   })
 
+  const setMicAndCamera = (micTrack: IAudioTrack | undefined, camTrack: IVideoTrack | undefined) => _produceAndSet(newState => {
+    newState.video = camTrack
+    newState.audio = micTrack
+  })
+
   const clearLocalTracks = () => _produceAndSet(newState => {
     // newState.audio?.dispose() //these throw errors on reconnection - some event handlers still leftover
     // newState.video?.dispose()
     newState.audio = undefined
     newState.video = undefined
   })
+
+  const setAvailableDevices = (deviceInfos: MediaDeviceInfo[]) => {
+    set({ availableDevices: deviceInfos });
+  }
 
   const setMyID = (id: string) => set({ id: id })
 
@@ -211,18 +237,23 @@ export const useLocalStore = create<ILocalStore>((set, get) => {
     ...state,
     setLocalPosition,
     setLocalTracks,
+    setMicAndCamera,
     toggleMute,
+    selectSettings,
     clearLocalTracks,
+    setAvailableDevices,
     setMyID,
     calculateUsersOnScreen,
     calculateUserOnScreen,
     calculateUsersInRadius,
     calculateUserInRadius,
     onPanChange,
+    setLocalText,
     setOnStage,
     toggleStage,
     toggleStageMute,
     setSelectedUserOnStage,
+    houstonWeNeedAReload,
   }
 })
 

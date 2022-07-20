@@ -1,1 +1,1 @@
-export const audioRadius = 650
+export const audioRadius = 1100

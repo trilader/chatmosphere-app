@@ -17,6 +17,7 @@ import { BigHeadline } from '../../components/common/BigHeadline'
 import { SubHeadline } from '../../components/common/SubHeadline'
 import { ErrorHandler } from '../../components/common/Info/ErrorHandler'
 import { Info } from '../../components/common/Info/Info'
+import { UserNameInputField } from '../../components/UserNameInputField/UserNameInputField'
 
 const BigHeadContainer = styled.div`
 	display: flex;
@@ -38,6 +39,13 @@ const CenterContainer = styled.div`
 export const Enter = () => {
 	const { id } = useParams() //get Id from url, should error check here I guess
 	const setConferenceName = useConferenceStore(React.useCallback(store => store.setConferenceName,[]))
+	const conferenceStore = useConferenceStore();
+	const [userName, setUserName] = React.useState<string>(conferenceStore.displayName)
+	const setConferenceUserName = useConferenceStore(state => state.setDisplayName)
+	const handleUserChange = (e) => {
+		setUserName(e.target.value)
+		setConferenceUserName(e.target.value)
+	}
 
 	React.useEffect(
 		() => {
@@ -70,6 +78,7 @@ export const Enter = () => {
 				<SubHeadline>The Open Source Videochat for Cozy Talks</SubHeadline>
 			</CenterContainer>
 			<Footer>
+				<UserNameInputField userName={userName} handleUserChange={handleUserChange}></UserNameInputField>
 				<MuteButton />
 				<JoinButton />
 				{/* <VideoButton /> */}

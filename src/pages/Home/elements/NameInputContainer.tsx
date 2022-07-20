@@ -5,8 +5,14 @@ import { NameInputForm } from './NameInputForm';
 import {useHistory } from 'react-router-dom'
 
 export const NameInputContainer = () => {
+	const conferenceStore = useConferenceStore();
+	const [userName, setUserName] = useState<string>(conferenceStore.displayName)
+	const setConferenceUserName = useConferenceStore(state => state.setDisplayName)
+	const handleUserChange = (e) => {
+		setUserName(e.target.value)
+	}
 
-  const [sessionName, setName] = useState<string>(conferenceName)
+  	const [sessionName, setName] = useState<string>(conferenceName)
 	const setConferenceName = useConferenceStore(state => state.setConferenceName)
 	const history = useHistory()
 
@@ -19,10 +25,12 @@ export const NameInputContainer = () => {
 		if(sessionName.length > 0) {
 			//set the conference name to use it in enter screen
 			//it won't join to conference yet until enter.tsx creates a connection
-			setConferenceName(sessionName) 
-			history.push(`/session/${sessionName}`)
+			setConferenceName(sessionName)
+			setConferenceUserName(userName)
+			if (! /sphere/i.test(userName)){
+				history.push(`/session/${sessionName}`)
+			}
 		}
 	}
-
-  return <NameInputForm defaultSessionName={sessionName} onSubmit={onSubmit} handleChange={handleChange} />
+	return <NameInputForm defaultSessionName={sessionName} onSubmit={onSubmit} handleChange={handleChange}  handleUserChange={handleUserChange} userName={userName}/>
 }

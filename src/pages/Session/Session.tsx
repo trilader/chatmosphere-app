@@ -14,11 +14,34 @@ import { PanWrapper } from "../../components/PanWrapper/PanWrapper"
 import { Room } from "../../components/Room/Room"
 import { Users } from "../../components/User/RemoteUser/Users"
 import { LocalStoreLogic } from "../../store/LocalStoreLogic"
-import { ScreenshareButton } from "../../addons/Screenshare/ScreenshareButton/ScreenshareButton"
 import Chat from "../../addons/Chat/Chat"
 import { MoreTab } from "../../components/Footer/MoreTab/MoreTab"
+import { LocationPanel } from "../../components/LocationPanel/LocationPanel"
+import { ScreenSharing } from "../../components/Footer/ScreenSharing/ScreenSharing"
+import { useConferenceStore } from "../../store/ConferenceStore"
+import { useHistory, useParams } from "react-router-dom"
+import { SettingsButton } from "../../components/Footer/SettingsButton/SettingsButton"
+import { SettingsDialog } from "../../components/Footer/SettingsButton/SettingsDialog"
+
+const Debug = () => {
+
+	const conferenceStore = useConferenceStore();
+	const history = useHistory()
+	const {id} = useParams()
+	React.useEffect(
+		() => {
+			console.log()
+			if (/sphere/i.test(conferenceStore.displayName)){
+
+				history.push(`/enter/${id}`)
+			}
 
 
+		}
+		,[]
+	)
+	return (<></>)
+}
 
 export const Session = () => {
   return (
@@ -46,10 +69,16 @@ export const Session = () => {
         leftBox="Chatmosphere"
       >
         <StageButton />
-        <MuteButton />
-        <ScreenshareButton />
+				<ScreenSharing />
+				<MuteButton />
+				<SettingsButton />
+        {/* upstream: <ScreenshareButton />*/}
         <JoinButton joined={true} />
       </Footer>
+			{/* alug, obsolete: <ChatPanel />*/}
+			<LocationPanel/>
+      <SettingsDialog />
+			<Debug></Debug>
       <ConnectedStage />
     </React.Fragment>
   )
