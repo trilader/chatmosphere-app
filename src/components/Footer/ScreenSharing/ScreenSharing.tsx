@@ -17,6 +17,7 @@ export const ScreenSharing = () => {
 
   return (
     <IconButton
+      title="Share Your Screen"
       round
       onClick={onStartScreenshare}
       IconStart={<ScreenShareIcon />}

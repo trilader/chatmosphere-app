@@ -36,6 +36,7 @@ return (
 			onClick={toggleSettings}
 			IconStart={<SettingsIcon />}
 			label="Settings"
+			title="Settings"
 		/>
 	)
 }

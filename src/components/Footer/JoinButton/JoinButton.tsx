@@ -25,11 +25,11 @@ export const JoinButton = ({ joined = false }) => {
 
 	if (joined) {
 		return (
-			<Button warning round onClick={onEndCall} label="Leave Call" />
+			<Button warning round onClick={onEndCall} label="Leave Call" title="Leave Call"/>
 		)
 	} else {
 		return (
-			<Button primary round onClick={onStartCall} label="Join" IconStart={	<PhoneOff />} />
+			<Button primary round onClick={onStartCall} label="Join"  title="Join Call" IconStart={	<PhoneOff />} />
 		)
 	}
 }

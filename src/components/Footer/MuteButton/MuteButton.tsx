@@ -12,8 +12,8 @@ export const MuteButton = () => {
   const mute = useLocalStore(store => store.mute)
 
   if(mute) {
-    return <IconButton round warning onClick={toggleMute} IconStart={<MicOff/>} label="Unmute" />
+    return <IconButton round warning onClick={toggleMute} IconStart={<MicOff/>} label="Unmute" title="Unmute yourself" />
   } else {
-    return <IconButton round small onClick={toggleMute} IconStart={<MicIcon/>} label="Mute" />
+    return <IconButton round small onClick={toggleMute} IconStart={<MicIcon/>} label="Mute" title="Mute yourself" />
   }
 }
