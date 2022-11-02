@@ -59,9 +59,13 @@ export const User = ({id, user}) => {
   } else {
     const ZoomIconStyle = {
         position: 'absolute',
-        left: '-20px',
+        left: '-28px',
         top: '0px',
-        cursor: 'pointer'
+        cursor: 'pointer',
+        backgroundColor: 'rgb(161 162 37 / 30%)',
+        padding: '5px',
+        borderRadius: '50%',
+        overflow: 'visible'
     };
     return(
         <div style={{position:'absolute', left:`${myPos.x}px`, top:`${myPos.y}px`, zIndex: 10}} className="userContainer" >
