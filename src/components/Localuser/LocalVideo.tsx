@@ -3,11 +3,11 @@ import styled from 'styled-components';
 import { useConferenceStore, VideoTrack } from './../../store/ConferenceStore';
 
 const Video = styled.video`
-  width: 200px; 
+  width: 200px;
   height: 200px;
   object-position: 50% 50%;
   display: block;
-  border-radius: 100px;
+  border-radius: 10px;
   object-fit: cover;
   transform: scaleX(-1);
 `

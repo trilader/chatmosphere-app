@@ -14,7 +14,7 @@ const Container = styled.div`
   height: ${panOptions.user.size.y}px;
   position: absolute;
   border: 4px solid #D9DBEB;
-  border-radius: 300px;
+  border-radius: 15px;
   cursor: default;
   &:active {
     cursor: default;
