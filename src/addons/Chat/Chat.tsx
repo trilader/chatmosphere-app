@@ -161,7 +161,8 @@ const Modal = ({ callback }) => {
       <ContentArea ref={chatParentRef}>
         {messages.map((message, key) => {
           if (users[message.id]) return <Message key={key} name={users?.[message.id].user._displayName} time={message.date.toLocaleString()} content={message.text}/>
-          return <Message key={key} name="You" time={message.date.toLocaleString()} content={message.text} />
+          if (conference!.myUserId()===message.id) return <Message key={key} name="You " time={message.date.toLocaleString()} content={message.text} />
+           return <Message key={key} name="Friendly Sphere" time={message.date.toLocaleString()} content={message.text} />
         })}
       </ContentArea>
 
