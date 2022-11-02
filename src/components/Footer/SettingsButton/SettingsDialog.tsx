@@ -328,7 +328,7 @@ export const SettingsDialog = () => {
 					}
 				</div>
 				<div style={{ paddingTop: "1em" }}>
-					<Button style={{ display: "inline-block" }} onClick={saveSettings}>{settings?.unchanged ? "Maybe fix a video?" : "Save"}</Button>
+					<Button primary style={{ display: "inline-block" }} onClick={saveSettings} label={settings?.unchanged ? "Maybe fix a video?" : "Save"} />
 				</div>
 			</StyleBox>
 		)
