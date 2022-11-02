@@ -23,10 +23,12 @@ const BaseButton = (props) => {
     primary,
     active,
     warning,
+    chat,
     focus,
     round,
     small,
     ghost,
+    messageCount,
     ...rest
   } = props
 
@@ -35,6 +37,7 @@ const BaseButton = (props) => {
       {IconStart}
       <label>{label}</label>
       {IconEnd}
+      {messageCount}
     </button>
   )
 }
@@ -77,7 +80,6 @@ export const Button = styled(BaseButton)<IButtonProps>`
       &:hover {
         background-color: ${(props) => props.theme.button.default.bg};
       }
-
     `}
   // Primary
   ${(props) =>
@@ -113,6 +115,24 @@ export const Button = styled(BaseButton)<IButtonProps>`
       }
     `}
 
+  // Attention
+  ${(props) =>
+    props.attention &&
+    css`
+      color: ${(props) => props.theme.button.attention.fg};
+      background-color: ${(props) => props.theme.button.attention.bg};
+      & svg {
+        stroke: ${(props) => props.theme.button.attention.fg};
+      }
+      &:hover {
+        background-color: ${(props) => props.theme.button.attention.bg_h};
+        border: solid 2px ${(props) => props.theme.color["3"]};
+      }
+      &:active {
+        background-color: ${(props) => props.theme.base["1"]};
+      }
+    `}
+
   // Warning
   ${(props) =>
     props.warning &&
@@ -141,7 +161,6 @@ export const Button = styled(BaseButton)<IButtonProps>`
         display: none;
       }
     `}
-
 `
 
 export const GhostButton = styled(Button)`

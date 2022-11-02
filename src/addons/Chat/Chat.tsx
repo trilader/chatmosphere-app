@@ -95,11 +95,11 @@ const replaceLinks = (txt:string) => {
 	return newTxt
 }
 
-const Message = ({name, content}) => {
+const Message = ({name,time, content}) => {
 	const replacedText = replaceLinks(content)
   return (
     <ChatElement>
-      <UserName>{name}</UserName>
+      <UserName>{name} {time}</UserName>
       <MessageText>{replacedText}</MessageText>
     </ChatElement>
   )
@@ -160,8 +160,8 @@ const Modal = ({ callback }) => {
     <MenuCard title="Chat" onClose={callback}>
       <ContentArea ref={chatParentRef}>
         {messages.map((message, key) => {
-          if (users[message.id]) return <Message key={key} name={users?.[message.id].user._displayName} content={message.text}/>
-          return <Message key={key} name="You" content={message.text} />
+          if (users[message.id]) return <Message key={key} name={users?.[message.id].user._displayName} time={message.date.toLocaleString()} content={message.text}/>
+          return <Message key={key} name="You" time={message.date.toLocaleString()} content={message.text} />
         })}
       </ContentArea>
 
@@ -175,20 +175,28 @@ const Modal = ({ callback }) => {
 
 const Chat = () => {
   const [show, toggleShow] = useState(false)
+  const unreadMessages = useConferenceStore((store) => store.unreadMessages) // Get all the messages
+  const conferenceStore = useConferenceStore()
+
+  const toggleChat = () => {
+    toggleShow(!show)
+    conferenceStore.clearUnreadMessages()
+  }
 
   return (
     <>
-      {/* <Button onClick={() => toggleShow(!show)}>
-        <ChatIcon/> <Label>Chat</Label>
-      </Button> */}
-      {show && <Modal callback={() => toggleShow(!show)} />}
-      <IconButton 
+      {show && <Modal callback={() => toggleChat()} />}
+      <IconButton
         IconStart={<ChatIcon />}
         active={show}
         label="Chat"
+        messageCount={!show ? unreadMessages : ""}
+        attention={!show ? unreadMessages > 0 : false}
         round
         ghost
-        onClick={() => toggleShow(!show)}
+        onClick={() => {
+          toggleChat()
+        }}
       />
     </>
   )

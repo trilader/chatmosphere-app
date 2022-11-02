@@ -4,7 +4,8 @@ import { useState } from "react"
 import { IconButton } from "../Buttons/Button"
 
 export const MenuCard = styled(Card)`
-  width: 270px;
+   width: 500px;
+  max-width:50%;
   padding: 15px;
   top: 15px;
   right: 15px;

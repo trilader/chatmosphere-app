@@ -183,7 +183,7 @@ declare type IConferenceStore = {
   calculateVolumes: (localPos:IVector2) => void // why here?
   replaceLocalTrackInConference?: (newTrack:IMediaTrack, oldTrack:IMediaTrack) => void
   addLocalTrackToConference?: (newTrack:IMediaTrack) => void
-  messages: Array<{id:string, text:string, nr:number}>
+  messages: Array<{id:string, text:string, nr:number,date:Date}>
   unreadMessages: number
   sendTextMessage:(text:string)=>void
   clearUnreadMessages:()=> void

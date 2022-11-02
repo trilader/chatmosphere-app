@@ -52,7 +52,7 @@ export const useConferenceStore = create<IConferenceStore>((set,get) => {
   const produceAndSet = (callback:(newState:IConferenceStore)=>void)=>set(state => produce(state, newState => callback(newState)))
 
   const _addMessage = (id:string, message:string, date:Date): void => produceAndSet ( newState => {
-    newState.messages.push({id:id,text:message,nr:date.getUTCDate()});
+    newState.messages.push({id:id,text:message,date:date,nr:0});
     newState.unreadMessages = newState.unreadMessages +1;
   })
 
@@ -161,18 +161,14 @@ export const useConferenceStore = create<IConferenceStore>((set,get) => {
 
     }
   }
-
-  // const _onMessageReceived = (id,message,time) => {
-  //   if (time===undefined){
-  //     time = new Date().toISOString();
-  //   }
-  //   time = new Date(Date.parse(time))
-  //   _addMessage(id,message,time)
-  // }
-
-  const _onMessageReceived = (id:string, text:string, nr:number) => {
-    set((store) => ({messages: [...store.messages, {id:id, text:text, nr:nr}]}))
+   const _onMessageReceived = (id,message,time) => {
+    if (time===undefined){
+      time = new Date().toISOString();
+    }
+    time = new Date(Date.parse(time))
+    _addMessage(id,message,time)
   }
+
 
   const _onParticipantPropertyChanged = (e:any) => {
     const id = e._id
