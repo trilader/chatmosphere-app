@@ -6,6 +6,7 @@ export interface IButtonProps {
   IconEnd?: React.ReactChild
   warning?: boolean
   primary?: boolean
+  attention?: boolean
   active?: boolean
   focus?: boolean
   label?: string
@@ -21,6 +22,7 @@ const BaseButton = (props) => {
     IconEnd,
     icon,
     primary,
+    attention,
     active,
     warning,
     chat,

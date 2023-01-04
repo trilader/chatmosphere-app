@@ -95,7 +95,7 @@ const warm = {
       bg_h:color.blue100,
       fg:color.mono100
     },
-       attention:{
+    attention:{
       bg: color.orange50,
       bg_h: color.orange20,
       fg: color.mono100
