@@ -150,14 +150,19 @@ declare type IJsMeet = {
   ) => Promise<IMediaTrack[]>
   JitsiConnection: any
 }
+
+declare type IXMPP = {
+  lastErrorMsg: string
+}
+
 declare type IJitsiConnection = {
   initJitsiConference: (
     conferenceName: string,
-    conferenceOptions,
+    conferenceOptions: any,
   ) => IJitsiConference
   connect: () => void
-  disconnect: () => void
-  xmpp:any
+  disconnect: (...args: any[]) => Promise<any>
+  xmpp: IXMPP
 }
 
 // should be connected with connection store 
