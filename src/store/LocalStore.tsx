@@ -139,8 +139,10 @@ const setLocalText = (newText:string)=>  {
   // TODO this could also be done in the Stage addon iself; it feels as if it should be there; otherhand its good to have all logic in store somehow
   const _setUserOnStage = (user) => {
     const stageUsers = get().usersOnStage
-    if (user.properties?.onStage) {
-      set(state => ({ usersOnStage: [...state.usersOnStage, user.id] }))
+    if (user.properties?.onStage || user?.linkMain) {
+      if (!stageUsers.includes(user.id)) {
+        set(state => ({ usersOnStage: [...state.usersOnStage, user.id] }))
+      }
     } else {
       if (stageUsers.includes(user.id)) {
         const clearedUsers = stageUsers.filter(el => el !== user.id)
@@ -156,7 +158,9 @@ const setLocalText = (newText:string)=>  {
     els.forEach(element => {
       _setUserOnStage(users[element.id])
       const tmpPos = element.getBoundingClientRect()
-      if (isOnScreen({ x: tmpPos.x, y: tmpPos.y }, tmpPos.width, tmpPos.height)) visibleUserIds.push(element.id)
+      if (users[element.id]?.linkMain || isOnScreen({ x: tmpPos.x, y: tmpPos.y }, tmpPos.width, tmpPos.height)) {
+        visibleUserIds.push(element.id)
+      }
     })
     _setVisibleUsers(visibleUserIds)
   }
@@ -165,7 +169,7 @@ const setLocalText = (newText:string)=>  {
     const visibleUsers = get().visibleUsers
     _setUserOnStage(user)
     const pos = el.getBoundingClientRect()
-    if (isOnScreen({ x: pos.x, y: pos.y }, pos.width, pos.height)) {
+    if (user?.linkMain || isOnScreen({ x: pos.x, y: pos.y }, pos.width, pos.height)) {
       if (visibleUsers.indexOf(user.id) === -1) {
         _pushVisibleUser(user.id)
       }
@@ -203,7 +207,7 @@ const setLocalText = (newText:string)=>  {
     const usersOnStage = get().usersOnStage
     conference?.setReceiverConstraints({
       "selectedSources": [...visibleUsers, ...usersOnStage],
-      "lastN": visibleUsers.length + usersOnStage.length,
+      "lastN": visibleUsers.length + usersOnStage.length + 100, // +100 because prioritizing selectedSources* before limiting lastN does NOT work at the moment. *: https://github.com/jitsi/jitsi-videobridge/blob/master/doc/allocation.md#1-prioritize
       "onStageSources": [...usersOnStage], // The endpoint ids of the participants that are prioritized up to a higher resolution.
       "defaultConstraints": { "maxHeight": 200 }, // Default resolution requested for all endpoints.
       "constraints": { // Endpoint specific resolution.
