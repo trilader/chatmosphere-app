@@ -139,10 +139,8 @@ const setLocalText = (newText:string)=>  {
   // TODO this could also be done in the Stage addon iself; it feels as if it should be there; otherhand its good to have all logic in store somehow
   const _setUserOnStage = (user) => {
     const stageUsers = get().usersOnStage
-    if (user.properties?.onStage || user?.linkMain) {
-      if (!stageUsers.includes(user.id)) {
-        set(state => ({ usersOnStage: [...state.usersOnStage, user.id] }))
-      }
+    if (user.properties?.onStage) {
+      set(state => ({ usersOnStage: [...state.usersOnStage, user.id] }))
     } else {
       if (stageUsers.includes(user.id)) {
         const clearedUsers = stageUsers.filter(el => el !== user.id)
